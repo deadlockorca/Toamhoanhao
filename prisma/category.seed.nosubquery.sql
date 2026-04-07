@@ -1,0 +1,159 @@
+START TRANSACTION;
+
+
+INSERT INTO `Category` (
+  `id`,
+  `name`,
+  `slug`,
+  `description`,
+  `sortOrder`,
+  `isActive`,
+  `parentId`,
+  `updatedAt`
+)
+VALUES
+  ('cat_sofa_ghe_thu_gian', 'Sofa - Ghế thư giãn', 'sofa-ghe-thu-gian', NULL, 1, 1, NULL, NOW()),
+  ('cat_ban', 'Bàn', 'ban', NULL, 2, 1, NULL, NOW()),
+  ('cat_ghe', 'Ghế', 'ghe', NULL, 3, 1, NULL, NOW()),
+  ('cat_tu_ke', 'Tủ - Kệ', 'tu-ke', NULL, 4, 1, NULL, NOW()),
+  ('cat_giuong', 'Giường', 'giuong', NULL, 5, 1, NULL, NOW()),
+  ('cat_dem', 'Đệm', 'dem', NULL, 6, 1, NULL, NOW()),
+  ('cat_do_trang_tri', 'Đồ trang trí', 'do-trang-tri', NULL, 7, 1, NULL, NOW()),
+  ('cat_do_gia_dung', 'Đồ gia dụng', 'do-gia-dung', NULL, 8, 1, NULL, NOW()),
+  ('cat_khong_gian_ngoai_troi', 'Không gian ngoài trời', 'khong-gian-ngoai-troi', NULL, 9, 1, NULL, NOW()),
+  ('cat_do_cho_be', 'Đồ cho bé', 'do-cho-be', NULL, 10, 1, NULL, NOW())
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `description` = VALUES(`description`),
+  `sortOrder` = VALUES(`sortOrder`),
+  `isActive` = VALUES(`isActive`),
+  `parentId` = VALUES(`parentId`),
+  `updatedAt` = NOW();
+
+INSERT INTO `Category` (
+  `id`,
+  `name`,
+  `slug`,
+  `description`,
+  `sortOrder`,
+  `isActive`,
+  `parentId`,
+  `updatedAt`
+)
+VALUES
+  ('cat_sofa_uu_dai_doc_quyen', 'Ưu đãi độc quyền', 'sofa-uu-dai-doc-quyen', NULL, 1, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_goc_sofa_bo', 'Sofa góc - Sofa bộ', 'sofa-goc-sofa-bo', NULL, 2, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_thu_gian_recliner', 'Sofa thư giãn Recliner', 'sofa-thu-gian-recliner', NULL, 3, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_don', 'Sofa đơn', 'sofa-don', NULL, 4, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_2_cho', 'Sofa 2 chỗ', 'sofa-2-cho', NULL, 5, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_3_cho', 'Sofa 3 chỗ', 'sofa-3-cho', NULL, 6, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_bed', 'Sofa bed', 'sofa-bed', NULL, 7, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_don_ottoman', 'Đôn - Ottoman', 'sofa-don-ottoman', NULL, 8, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+  ('cat_sofa_da_bo', 'Sofa da bò', 'sofa-da-bo', NULL, 9, 1, 'cat_sofa_ghe_thu_gian', NOW()),
+
+  ('cat_ban_bo_ban_an', 'Bộ bàn ăn', 'ban-bo-ban-an', NULL, 1, 1, 'cat_ban', NOW()),
+  ('cat_ban_an', 'Bàn ăn', 'ban-ban-an', NULL, 2, 1, 'cat_ban', NOW()),
+  ('cat_ban_cafe_ban_tra', 'Bàn Cafe - Bàn trà', 'ban-cafe-ban-tra', NULL, 3, 1, 'cat_ban', NOW()),
+  ('cat_ban_console_ke_console', 'Bàn Console - Kệ Console', 'ban-console-ke-console', NULL, 4, 1, 'cat_ban', NOW()),
+  ('cat_ban_lamp_ban_goc', 'Bàn Lamp - Bàn góc', 'ban-lamp-ban-goc', NULL, 5, 1, 'cat_ban', NOW()),
+  ('cat_ban_hoc_ban_lam_viec', 'Bàn học - Bàn làm việc', 'ban-hoc-ban-lam-viec', NULL, 6, 1, 'cat_ban', NOW()),
+  ('cat_ban_tu_trang_diem', 'Bàn - Tủ trang điểm', 'ban-tu-trang-diem', NULL, 7, 1, 'cat_ban', NOW()),
+  ('cat_ban_ngoai_troi', 'Bàn ngoài trời', 'ban-ngoai-troi', NULL, 8, 1, 'cat_ban', NOW()),
+
+  ('cat_ghe_ghe', 'Ghế', 'ghe-ghe', NULL, 1, 1, 'cat_ghe', NOW()),
+  ('cat_ghe_bar_ghe_don', 'Ghế Bar - Ghế đôn', 'ghe-bar-ghe-don', NULL, 2, 1, 'cat_ghe', NOW()),
+  ('cat_ghe_bench', 'Ghế Bench', 'ghe-bench', NULL, 3, 1, 'cat_ghe', NOW()),
+  ('cat_ghe_ngoai_troi', 'Ghế ngoài trời', 'ghe-ngoai-troi', NULL, 4, 1, 'cat_ghe', NOW()),
+  ('cat_ghe_hoc_ghe_lam_viec', 'Ghế học - Ghế làm việc', 'ghe-hoc-ghe-lam-viec', NULL, 5, 1, 'cat_ghe', NOW()),
+
+  ('cat_tu_ke_tu_tivi_ke_tivi', 'Tủ Tivi - Kệ Tivi', 'tu-ke-tu-tivi-ke-tivi', NULL, 1, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_dau_giuong', 'Tủ đầu giường', 'tu-ke-tu-dau-giuong', NULL, 2, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_kinh_trung_bay_tu_sach', 'Tủ kính - Tủ trưng bầy - Tủ sách', 'tu-ke-tu-kinh-trung-bay-tu-sach', NULL, 3, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_sideboard_tu_buffet', 'Tủ Sideboard - Tủ Buffet', 'tu-ke-tu-sideboard-tu-buffet', NULL, 4, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_ngan_keo_tu_trang_tri_nho', 'Tủ ngăn kéo - Tủ trang trí nhỏ', 'tu-ke-tu-ngan-keo-tu-trang-tri-nho', NULL, 5, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_nha_tam_lavabo', 'Tủ nhà tắm - Lavabo', 'tu-ke-tu-nha-tam-lavabo', NULL, 6, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_ke_giay', 'Tủ - Kệ giầy', 'tu-ke-tu-ke-giay', NULL, 7, 1, 'cat_tu_ke', NOW()),
+  ('cat_tu_ke_tu_quan_ao', 'Tủ quần áo', 'tu-ke-tu-quan-ao', NULL, 8, 1, 'cat_tu_ke', NOW()),
+
+  ('cat_giuong_don_cui', 'Giường đơn - Cũi', 'giuong-don-cui', NULL, 1, 1, 'cat_giuong', NOW()),
+  ('cat_giuong_tang', 'Giường tầng', 'giuong-tang', NULL, 2, 1, 'cat_giuong', NOW()),
+  ('cat_giuong_queen', 'Giường Queen', 'giuong-queen', NULL, 3, 1, 'cat_giuong', NOW()),
+  ('cat_giuong_king', 'Giường King', 'giuong-king', NULL, 4, 1, 'cat_giuong', NOW()),
+  ('cat_giuong_2m2', 'Giường 2m2', 'giuong-2m2', NULL, 5, 1, 'cat_giuong', NOW()),
+  ('cat_bo_phong_ngu', 'Bộ phòng ngủ', 'bo-phong-ngu', NULL, 6, 1, 'cat_giuong', NOW()),
+
+  ('cat_do_trang_tri_giang_sinh', 'Đồ trang trí Giáng Sinh', 'do-trang-tri-giang-sinh', NULL, 1, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_pha_le_cao_cap_bohemia', 'Pha lê cao cấp Bohemia', 'pha-le-cao-cap-bohemia', NULL, 2, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_tranh', 'Tranh', 'do-trang-tri-tranh', NULL, 3, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_phu_kien_trang_tri', 'Phụ kiện trang trí', 'phu-kien-trang-tri', NULL, 4, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_den', 'Đèn', 'do-trang-tri-den', NULL, 5, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_binh_hoa_lo_hoa', 'Bình hoa - Lọ hoa', 'binh-hoa-lo-hoa', NULL, 6, 1, 'cat_do_trang_tri', NOW()),
+  ('cat_hoa_gia_cay_gia', 'Hoa giả- cây giả', 'hoa-gia-cay-gia', NULL, 7, 1, 'cat_do_trang_tri', NOW()),
+
+  ('cat_do_gia_dung_do_nha_bep', 'Đồ gia dụng - Đồ nhà bếp', 'do-gia-dung-do-nha-bep', NULL, 1, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_khan_trai_ban_tam_lot_trang_tri', 'Khăn trải bàn - Tấm lót trang trí', 'khan-trai-ban-tam-lot-trang-tri', NULL, 2, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_tham', 'Thảm', 'do-gia-dung-tham', NULL, 3, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_gio_trang_tri_hop_trang_tri', 'Giỏ trang trí - Hộp trang trí', 'gio-trang-tri-hop-trang-tri', NULL, 4, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_nen_tinh_dau_thom', 'Nến - Tinh dầu thơm', 'nen-tinh-dau-thom', NULL, 5, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_bo_chan_ga_goi', 'Bộ chăn ga gối', 'bo-chan-ga-goi', NULL, 6, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_vo_goi_trang_tri', 'Vỏ gối trang trí', 'vo-goi-trang-tri', NULL, 7, 1, 'cat_do_gia_dung', NOW()),
+  ('cat_guong_trang_tri', 'Gương trang trí', 'guong-trang-tri', NULL, 8, 1, 'cat_do_gia_dung', NOW()),
+
+  ('cat_khong_gian_ban_ngoai_troi', 'Bàn ngoài trời', 'khong-gian-ban-ngoai-troi', NULL, 1, 1, 'cat_khong_gian_ngoai_troi', NOW()),
+  ('cat_khong_gian_ghe_ngoai_troi', 'Ghế ngoài trời', 'khong-gian-ghe-ngoai-troi', NULL, 2, 1, 'cat_khong_gian_ngoai_troi', NOW()),
+  ('cat_khong_gian_bo_ban_ghe_ngoai_troi', 'Bộ bàn ghế ngoài trời', 'khong-gian-bo-ban-ghe-ngoai-troi', NULL, 3, 1, 'cat_khong_gian_ngoai_troi', NOW()),
+  ('cat_khong_gian_san_pham_ngoai_troi_khac', 'Sản phẩm ngoài trời khác', 'khong-gian-san-pham-ngoai-troi-khac', NULL, 4, 1, 'cat_khong_gian_ngoai_troi', NOW())
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `description` = VALUES(`description`),
+  `sortOrder` = VALUES(`sortOrder`),
+  `isActive` = VALUES(`isActive`),
+  `parentId` = VALUES(`parentId`),
+  `updatedAt` = NOW();
+
+INSERT INTO `Category` (
+  `id`,
+  `name`,
+  `slug`,
+  `description`,
+  `sortOrder`,
+  `isActive`,
+  `parentId`,
+  `updatedAt`
+)
+VALUES
+  ('cat_bo_ban_2_cho', 'Bộ bàn 2 chỗ', 'ban-bo-ban-an-2-cho', NULL, 1, 1, 'cat_ban_bo_ban_an', NOW()),
+  ('cat_bo_ban_4_cho', 'Bộ bàn 4 chỗ', 'ban-bo-ban-an-4-cho', NULL, 2, 1, 'cat_ban_bo_ban_an', NOW()),
+  ('cat_bo_ban_6_cho', 'Bộ bàn 6 chỗ', 'ban-bo-ban-an-6-cho', NULL, 3, 1, 'cat_ban_bo_ban_an', NOW()),
+  ('cat_bo_ban_8_cho', 'Bộ bàn 8 chỗ', 'ban-bo-ban-an-8-cho', NULL, 4, 1, 'cat_ban_bo_ban_an', NOW()),
+  ('cat_bo_ban_an', 'Bộ bàn ăn', 'ban-bo-ban-an-bo-ban-an', NULL, 5, 1, 'cat_ban_bo_ban_an', NOW()),
+  ('cat_bo_ban_an_ban', 'BÀN', 'ban-bo-ban-an-ban', NULL, 6, 1, 'cat_ban_bo_ban_an', NOW()),
+
+  ('cat_tu_quan_ao_duoi_1m', 'Tủ quần áo < 1m', 'tu-quan-ao-duoi-1m', NULL, 1, 1, 'cat_tu_ke_tu_quan_ao', NOW()),
+  ('cat_tu_quan_ao_1m_2m', 'Tủ quần áo 1m - 2m', 'tu-quan-ao-1m-2m', NULL, 2, 1, 'cat_tu_ke_tu_quan_ao', NOW()),
+  ('cat_tu_quan_ao_tren_2m', 'Tủ quần áo > 2m', 'tu-quan-ao-tren-2m', NULL, 3, 1, 'cat_tu_ke_tu_quan_ao', NOW()),
+  ('cat_mac_treo_quan_ao', 'Mắc treo quần áo', 'tu-quan-ao-mac-treo', NULL, 4, 1, 'cat_tu_ke_tu_quan_ao', NOW()),
+
+  ('cat_giuong_don_size_chau_au', 'Giường đơn size Châu Âu', 'giuong-don-size-chau-au', NULL, 1, 1, 'cat_giuong_don_cui', NOW()),
+  ('cat_giuong_120x200', 'Giường 120x200', 'giuong-120x200', NULL, 2, 1, 'cat_giuong_don_cui', NOW()),
+  ('cat_giuong_140x200', 'Giường 140x200', 'giuong-140x200', NULL, 3, 1, 'cat_giuong_don_cui', NOW()),
+  ('cat_cui_tre_em', 'Cũi trẻ em', 'cui-tre-em', NULL, 4, 1, 'cat_giuong_don_cui', NOW()),
+
+  ('cat_giuong_queen_160x200', 'Giường 160x200', 'giuong-queen-160x200', NULL, 1, 1, 'cat_giuong_queen', NOW()),
+  ('cat_giuong_queen_szie_chau_au', 'Giường queen szie Châu Âu', 'giuong-queen-size-chau-au', NULL, 2, 1, 'cat_giuong_queen', NOW()),
+
+  ('cat_giuong_king_180x200', 'Giường 180x200', 'giuong-king-180x200', NULL, 1, 1, 'cat_giuong_king', NOW()),
+  ('cat_giuong_king_size_chau_au', 'Giường King size Châu Âu', 'giuong-king-size-chau-au', NULL, 2, 1, 'cat_giuong_king', NOW()),
+
+  ('cat_bo_phong_ngu_king', 'Bộ phòng ngủ King', 'bo-phong-ngu-king', NULL, 1, 1, 'cat_bo_phong_ngu', NOW()),
+  ('cat_bo_phong_ngu_queen', 'Bộ phòng ngủ Queen', 'bo-phong-ngu-queen', NULL, 2, 1, 'cat_bo_phong_ngu', NOW()),
+  ('cat_bo_giuong_don', 'Bộ giường đơn', 'bo-giuong-don', NULL, 3, 1, 'cat_bo_phong_ngu', NOW())
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `description` = VALUES(`description`),
+  `sortOrder` = VALUES(`sortOrder`),
+  `isActive` = VALUES(`isActive`),
+  `parentId` = VALUES(`parentId`),
+  `updatedAt` = NOW();
+
+COMMIT;

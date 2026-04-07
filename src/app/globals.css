@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f4f5;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+}
+
+.footer-info-content {
+  color: #2c3544;
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+.footer-info-content p,
+.footer-info-content div {
+  margin: 0.7rem 0;
+}
+
+.footer-info-content table {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.footer-info-content table tbody {
+  display: table;
+  min-width: 640px;
+  width: 100%;
+}
+
+.footer-info-content td,
+.footer-info-content th {
+  border: 0;
+  padding: 0.55rem 0.65rem;
+  vertical-align: top;
+}
+
+.footer-info-content--table-borders td,
+.footer-info-content--table-borders th {
+  border: 1px solid #c2cad6;
+  background: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-info-content--table-borders table {
+  border: 1px solid #c2cad6;
+}
+
+.footer-info-content--table-borders table tbody tr:first-child td,
+.footer-info-content--table-borders table tbody tr:first-child th {
+  background: #f3f6fb;
+  font-weight: 700;
+}
+
+.footer-info-content--table-borders table tbody tr:nth-child(even) td {
+  background: #fbfcfe;
+}
+
+.footer-info-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.footer-info-content a {
+  color: #8e751d;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-word;
+}
