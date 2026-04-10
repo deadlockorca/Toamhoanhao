@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const adminLinks = [
   { href: "/admin/products", label: "Sản phẩm" },
   { href: "/admin/variants", label: "Biến thể" },
+  { href: "/admin/banners", label: "Banner" },
   { href: "/admin/collections", label: "Bộ sưu tập" },
   { href: "/admin/orders", label: "Đơn hàng" },
 ];
@@ -34,4 +35,3 @@ export default function AdminSectionNav() {
     </nav>
   );
 }
-

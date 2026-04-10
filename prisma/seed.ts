@@ -20,6 +20,18 @@ type SeedProduct = {
   categorySlug: string;
 };
 
+const resolveR2PublicBaseUrl = () => {
+  const cleaned = process.env.R2_PUBLIC_BASE_URL?.trim().replace(/\/+$/, "");
+  if (!cleaned) {
+    throw new Error("Thiếu R2_PUBLIC_BASE_URL. Không thể seed banner bằng URL R2.");
+  }
+  return cleaned;
+};
+
+const r2PublicBaseUrl = resolveR2PublicBaseUrl();
+
+const toR2BannerUrl = (fileName: string) => `${r2PublicBaseUrl}/banners/${fileName}`;
+
 const categories: SeedCategory[] = [
   {
     name: "Sofa - Ghế thư giãn",
@@ -276,28 +288,28 @@ const banners = [
     slug: "banner-phong-khach",
     title: "Banner phòng khách cao cấp",
     subtitle: "Nâng tầm không gian sống cùng nội thất xuất Âu.",
-    imageUrl: "/banners/slider-1.jpg",
+    imageUrl: toR2BannerUrl("slider-1.jpg"),
     sortOrder: 1,
   },
   {
     slug: "banner-phong-ngu",
     title: "Banner nội thất phòng ngủ",
     subtitle: "Thiết kế hiện đại, chất liệu cao cấp.",
-    imageUrl: "/banners/slider-2.jpg",
+    imageUrl: toR2BannerUrl("slider-2.jpg"),
     sortOrder: 2,
   },
   {
     slug: "banner-lavabo",
     title: "Bộ sưu tập Lavabo mới về",
     subtitle: "Tổ Ấm Hoàn Hảo tuyển chọn mẫu đẹp mỗi tuần.",
-    imageUrl: "/banners/hero-banner.jpg",
+    imageUrl: toR2BannerUrl("hero-banner.jpg"),
     sortOrder: 3,
   },
   {
     slug: "banner-bo-suu-tap",
     title: "Banner bộ sưu tập nội thất",
     subtitle: "Ưu đãi nổi bật theo từng không gian.",
-    imageUrl: "/banners/slider-5.jpg",
+    imageUrl: toR2BannerUrl("slider-5.jpg"),
     sortOrder: 4,
   },
 ];
