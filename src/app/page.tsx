@@ -852,70 +852,57 @@ export default function Home() {
           <section
             role="dialog"
             aria-modal="true"
-            aria-label="Ưu đãi độc quyền"
-            className="relative z-[1] w-full max-w-[520px] overflow-visible rounded-[22px] border border-[#e2c850] bg-[linear-gradient(165deg,#ffe45f_0%,#f5d437_62%,#efca1f_100%)] shadow-[0_24px_60px_rgba(0,0,0,0.38)]"
+            aria-label={popupBanner?.title?.trim() || "Ưu đãi độc quyền"}
+            className="relative z-[1] w-full max-w-[860px]"
           >
-            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[22px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.45),rgba(255,255,255,0)_38%)]" />
-              <div className="absolute bottom-0 left-0 right-0 h-[48%] bg-[repeating-linear-gradient(90deg,rgba(133,103,16,0.08)_0px,rgba(133,103,16,0.08)_1px,transparent_1px,transparent_24px)]" />
-              <div className="absolute right-[-40px] top-[196px] h-[300px] w-[300px] rounded-full bg-white/95" />
-            </div>
-
             <button
               type="button"
               aria-label="Đóng"
               onClick={closePromoPopup}
-              className="absolute right-3 top-3 z-[30] inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[22px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition hover:bg-white"
+              className="absolute right-3 top-3 z-[30] inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[24px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition hover:bg-white"
             >
               ×
             </button>
 
-            <div className="relative z-[2] px-5 pb-5 pt-6 pr-[112px] md:px-6 md:pb-6 md:pt-7 md:pr-[142px]">
-              <div className="w-fit border-b border-[#c6a10f] pb-1">
-                <p className="font-serif text-[24px] font-semibold uppercase leading-none tracking-[0.03em] text-[#8b6d00]">
-                  {siteBrandName}
-                </p>
-                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#96780e]">
-                  {siteBrandTagline}
-                </p>
-              </div>
-
-              <h2 className="mt-4 text-[52px] font-black uppercase leading-[0.95] tracking-[-0.01em] text-white drop-shadow-[0_2px_0_rgba(35,35,35,0.95)] md:text-[58px]">
-                {promoTitle}
-              </h2>
-              <p className="mt-1 text-[34px] font-extrabold leading-[1.02] tracking-[-0.02em] text-[#101010] md:text-[40px]">
-                {promoSubtitle}
-              </p>
-              <p className="mt-1 text-[118px] font-black leading-[0.9] tracking-[-0.03em] text-white drop-shadow-[0_4px_0_rgba(20,20,20,0.9)] md:text-[132px]">
-                -50%
-              </p>
-
-              <div className="mt-4 flex h-[6px] w-[200px] overflow-hidden rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.15)]">
-                <span className="w-[45%] bg-[#2f9e44]" />
-                <span className="w-[20%] bg-[#fff7d6]" />
-                <span className="w-[35%] bg-[#c93838]" />
-              </div>
-
-              <Link
-                href={promoCtaHref}
-                onClick={closePromoPopup}
-                className="mt-6 inline-flex h-12 items-center justify-center rounded-[10px] border border-[#d5d5d5] bg-white px-7 text-[19px] font-bold uppercase tracking-[0.04em] text-[#b63d2f] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition hover:-translate-y-[1px] hover:bg-[#fffdf8]"
-              >
-                {promoCtaLabel}
-              </Link>
+            <div className="overflow-hidden rounded-[24px] border border-[#e2c850] bg-[#f4d83f] shadow-[0_24px_60px_rgba(0,0,0,0.38)]">
+              {promoImage ? (
+                <Link
+                  href={promoCtaHref}
+                  onClick={closePromoPopup}
+                  className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222] focus-visible:ring-offset-2"
+                >
+                  <div className="relative aspect-[16/10] w-full max-h-[80vh] bg-[#f4d83f]">
+                    <Image
+                      src={promoImage}
+                      alt={popupBanner?.alt?.trim() || popupBanner?.title?.trim() || "Ưu đãi nội thất"}
+                      fill
+                      sizes="(max-width: 768px) 92vw, 860px"
+                      className="object-contain object-center"
+                    />
+                  </div>
+                </Link>
+              ) : (
+                <div className="px-5 py-6 text-[#1a1a1a] md:px-8 md:py-9">
+                  <p className="font-serif text-[30px] font-semibold uppercase leading-none tracking-[0.03em] text-[#8b6d00]">
+                    {siteBrandName}
+                  </p>
+                  <p className="mt-2 text-[14px] font-semibold uppercase tracking-[0.12em] text-[#96780e]">
+                    {siteBrandTagline}
+                  </p>
+                  <h2 className="mt-4 text-[36px] font-black uppercase leading-[0.95] text-[#101010] md:text-[50px]">
+                    {promoTitle}
+                  </h2>
+                  <p className="mt-2 text-[22px] font-extrabold leading-[1.08] md:text-[30px]">{promoSubtitle}</p>
+                  <Link
+                    href={promoCtaHref}
+                    onClick={closePromoPopup}
+                    className="mt-5 inline-flex h-11 items-center justify-center rounded-[10px] border border-[#d5d5d5] bg-white px-6 text-[17px] font-bold uppercase tracking-[0.03em] text-[#b63d2f] shadow-[0_8px_18px_rgba(0,0,0,0.16)]"
+                  >
+                    {promoCtaLabel}
+                  </Link>
+                </div>
+              )}
             </div>
-
-            {promoImage ? (
-              <div className="pointer-events-none absolute -bottom-8 -right-[190px] z-[6] h-[340px] w-[420px] md:-bottom-10 md:-right-[220px] md:h-[382px] md:w-[468px]">
-                <Image
-                  src={promoImage}
-                  alt={popupBanner?.alt || "Ưu đãi sofa"}
-                  fill
-                  sizes="(max-width: 768px) 420px, 468px"
-                  className="object-cover object-[86%_78%] scale-[1.16] drop-shadow-[0_16px_26px_rgba(0,0,0,0.22)]"
-                />
-              </div>
-            ) : null}
           </section>
         </div>
       ) : null}
