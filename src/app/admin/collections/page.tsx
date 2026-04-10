@@ -259,7 +259,7 @@ export default function AdminCollectionsPage() {
                     value={form.imageUrl}
                     onChange={(event) => setForm((prev) => ({ ...prev, imageUrl: event.target.value }))}
                     className="w-full rounded-xl border border-[#cdd1d8] px-3 py-2.5 text-[14px] focus:border-[#222] focus:outline-none"
-                    placeholder="/banners/collection-phong-khach.jpg"
+                    placeholder="https://.../collections/collection-phong-khach.jpg"
                   />
                 </label>
                 <R2ImageUploadField

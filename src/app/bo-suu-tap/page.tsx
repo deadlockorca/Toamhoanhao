@@ -35,7 +35,7 @@ export default async function CollectionIndexPage() {
             {collections.length > 0 ? (
               <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {collections.map((collection) => {
-                  const image = collection.imageUrl?.trim() || "/banners/f1.jpg";
+                  const image = collection.imageUrl?.trim() || "/products/p1.jpg";
 
                   return (
                     <Link

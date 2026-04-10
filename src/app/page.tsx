@@ -1393,7 +1393,7 @@ export default function Home() {
                         >
                           <div className="relative aspect-[16/10] overflow-hidden bg-[#f3f4f6]">
                             <Image
-                              src={collection.imageUrl ?? "/banners/f1.jpg"}
+                              src={collection.imageUrl ?? "/products/p1.jpg"}
                               alt={collection.name}
                               fill
                               sizes="(max-width: 640px) 48vw, (max-width: 1024px) 48vw, 20vw"
