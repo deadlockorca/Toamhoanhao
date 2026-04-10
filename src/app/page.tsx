@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
 
 function GlobeIcon() {
@@ -402,6 +402,15 @@ type BannerItem = {
   alt: string;
 };
 
+type PopupBannerItem = {
+  src: string;
+  alt: string;
+  title?: string | null;
+  subtitle?: string | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+};
+
 type ProductTabId = "new" | "best" | "sale";
 
 type ProductItem = {
@@ -481,6 +490,9 @@ const formatVnd = (value: number) =>
 const isContactPrice = (price: number, originalPrice?: number) =>
   price <= 0 && (originalPrice == null || originalPrice <= 0);
 
+const PROMO_POPUP_STORAGE_KEY = "toamhoanhao:promo-popup-closed-at";
+const PROMO_POPUP_COOLDOWN_MS = 12 * 60 * 60 * 1000;
+
 type ProductApiPayload = Partial<Record<ProductTabId, ProductItem[]>>;
 
 type HomeApiPayload = {
@@ -498,6 +510,7 @@ type HomeApiPayload = {
   }>;
   categoryTree?: CategoryNode[];
   heroBanners?: BannerItem[];
+  popupBanner?: PopupBannerItem | null;
   products?: ProductApiPayload;
   site?: {
     brand?: {
@@ -516,11 +529,30 @@ export default function Home() {
   const [collectionLinks, setCollectionLinks] = useState<HeaderCollectionLink[]>([]);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
   const [heroBanners, setHeroBanners] = useState<BannerItem[]>([]);
+  const [popupBanner, setPopupBanner] = useState<PopupBannerItem | null>(null);
   const [siteBrandName, setSiteBrandName] = useState("Tổ Ấm Hoàn Hảo");
   const [siteBrandTagline, setSiteBrandTagline] = useState("Nội thất xuất khẩu");
   const [sitePhone, setSitePhone] = useState("0901.827.555");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [isPromoPopupOpen, setIsPromoPopupOpen] = useState(false);
+  const [isPromoPopupEligible, setIsPromoPopupEligible] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    try {
+      const rawValue = window.localStorage.getItem(PROMO_POPUP_STORAGE_KEY);
+      if (!rawValue) {
+        return true;
+      }
+
+      const closedAt = Number(rawValue);
+      return !(Number.isFinite(closedAt) && Date.now() - closedAt < PROMO_POPUP_COOLDOWN_MS);
+    } catch {
+      return true;
+    }
+  });
   const [activeMegaCategoryName, setActiveMegaCategoryName] = useState("");
   const [databaseProductData, setDatabaseProductData] = useState<Record<ProductTabId, ProductItem[]>>({
     new: [],
@@ -536,6 +568,55 @@ export default function Home() {
   });
   const collectionRailRef = useRef<HTMLDivElement | null>(null);
   const totalSlides = heroBanners.length;
+  const promoImage = popupBanner?.src ?? null;
+  const promoTitle = popupBanner?.title?.trim() || "SOFA DA BỘ";
+  const promoSubtitle = popupBanner?.subtitle?.trim() || "Ưu Đãi Độc Quyền";
+  const promoCtaLabel = popupBanner?.ctaLabel?.trim() || "Liên hệ ngay";
+  const promoCtaHref = popupBanner?.ctaHref?.trim() || "/lien-he";
+
+  const closePromoPopup = useCallback(() => {
+    setIsPromoPopupOpen(false);
+    setIsPromoPopupEligible(false);
+    try {
+      window.localStorage.setItem(PROMO_POPUP_STORAGE_KEY, String(Date.now()));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!isPromoPopupEligible || !popupBanner?.src?.trim()) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsPromoPopupOpen(true);
+    }, 900);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [isPromoPopupEligible, popupBanner]);
+
+  useEffect(() => {
+    if (!isPromoPopupOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closePromoPopup();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [closePromoPopup, isPromoPopupOpen]);
 
   useEffect(() => {
     if (totalSlides <= 1) {
@@ -707,6 +788,7 @@ export default function Home() {
           setCollectionCards(normalizedCollectionCards);
           setCategoryTree(Array.isArray(payload.categoryTree) ? payload.categoryTree : []);
           setHeroBanners(Array.isArray(payload.heroBanners) ? payload.heroBanners : []);
+          setPopupBanner(payload.popupBanner?.src ? payload.popupBanner : null);
           setDatabaseProductData(nextData);
 
           const brandName = payload.site?.brand?.name?.trim();
@@ -734,6 +816,7 @@ export default function Home() {
           setCollectionLinks([]);
           setCategoryTree([]);
           setHeroBanners([]);
+          setPopupBanner(null);
         }
       }
     };
@@ -757,6 +840,86 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
+      {isPromoPopupOpen ? (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-6">
+          <button
+            type="button"
+            aria-label="Đóng popup"
+            onClick={closePromoPopup}
+            className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"
+          />
+
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label="Ưu đãi độc quyền"
+            className="relative z-[1] w-full max-w-[520px] overflow-visible rounded-[22px] border border-[#e2c850] bg-[linear-gradient(165deg,#ffe45f_0%,#f5d437_62%,#efca1f_100%)] shadow-[0_24px_60px_rgba(0,0,0,0.38)]"
+          >
+            <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[22px]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.45),rgba(255,255,255,0)_38%)]" />
+              <div className="absolute bottom-0 left-0 right-0 h-[48%] bg-[repeating-linear-gradient(90deg,rgba(133,103,16,0.08)_0px,rgba(133,103,16,0.08)_1px,transparent_1px,transparent_24px)]" />
+              <div className="absolute right-[-28px] top-[208px] h-[282px] w-[282px] rounded-full bg-white/95" />
+            </div>
+
+            <button
+              type="button"
+              aria-label="Đóng"
+              onClick={closePromoPopup}
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[22px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition hover:bg-white"
+            >
+              ×
+            </button>
+
+            <div className="relative z-[2] px-5 pb-5 pt-6 pr-[112px] md:px-6 md:pb-6 md:pt-7 md:pr-[142px]">
+              <div className="w-fit border-b border-[#c6a10f] pb-1">
+                <p className="font-serif text-[24px] font-semibold uppercase leading-none tracking-[0.03em] text-[#8b6d00]">
+                  {siteBrandName}
+                </p>
+                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#96780e]">
+                  {siteBrandTagline}
+                </p>
+              </div>
+
+              <h2 className="mt-4 text-[52px] font-black uppercase leading-[0.95] tracking-[-0.01em] text-white drop-shadow-[0_2px_0_rgba(35,35,35,0.95)] md:text-[58px]">
+                {promoTitle}
+              </h2>
+              <p className="mt-1 text-[34px] font-extrabold leading-[1.02] tracking-[-0.02em] text-[#101010] md:text-[40px]">
+                {promoSubtitle}
+              </p>
+              <p className="mt-1 text-[118px] font-black leading-[0.9] tracking-[-0.03em] text-white drop-shadow-[0_4px_0_rgba(20,20,20,0.9)] md:text-[132px]">
+                -50%
+              </p>
+
+              <div className="mt-4 flex h-[6px] w-[200px] overflow-hidden rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.15)]">
+                <span className="w-[45%] bg-[#2f9e44]" />
+                <span className="w-[20%] bg-[#fff7d6]" />
+                <span className="w-[35%] bg-[#c93838]" />
+              </div>
+
+              <Link
+                href={promoCtaHref}
+                onClick={closePromoPopup}
+                className="mt-6 inline-flex h-12 items-center justify-center rounded-[10px] border border-[#d5d5d5] bg-white px-7 text-[19px] font-bold uppercase tracking-[0.04em] text-[#b63d2f] shadow-[0_8px_18px_rgba(0,0,0,0.16)] transition hover:-translate-y-[1px] hover:bg-[#fffdf8]"
+              >
+                {promoCtaLabel}
+              </Link>
+            </div>
+
+            {promoImage ? (
+              <div className="pointer-events-none absolute -bottom-2 -right-[86px] z-[1] h-[268px] w-[58%] md:-right-[96px] md:h-[292px]">
+                <Image
+                  src={promoImage}
+                  alt={popupBanner?.alt || "Ưu đãi sofa"}
+                  fill
+                  sizes="320px"
+                  className="object-contain object-bottom drop-shadow-[0_14px_22px_rgba(0,0,0,0.18)]"
+                />
+              </div>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
+
       <header className="bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
         <div className="border-b border-[#d7d9de] bg-[#f1f2f4] md:hidden">
           <div className="flex items-center justify-between gap-3 px-4 py-3">

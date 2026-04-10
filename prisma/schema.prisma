@@ -104,6 +104,11 @@ enum StoreLocationType {
   WAREHOUSE
 }
 
+enum BannerKind {
+  HERO
+  POPUP
+}
+
 model Category {
   id          String     @id @default(cuid())
   name        String
@@ -250,6 +255,7 @@ model CollectionItem {
 model Banner {
   id        String   @id @default(cuid())
   slug      String   @unique
+  kind      BannerKind @default(HERO)
   title     String
   subtitle  String?
   imageUrl  String

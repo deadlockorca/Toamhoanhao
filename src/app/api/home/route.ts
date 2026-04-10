@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { BannerKind } from "@prisma/client";
 
 import { defaultCategories } from "@/lib/default-categories";
 import { prisma } from "@/lib/prisma";
@@ -145,9 +146,12 @@ export async function GET(request: Request) {
           orderBy: [{ sortOrder: "asc" as const }, { createdAt: "asc" as const }],
           select: {
             id: true,
+            kind: true,
             title: true,
             subtitle: true,
             imageUrl: true,
+            ctaLabel: true,
+            ctaHref: true,
           },
         }),
         prisma.category.findMany({
@@ -203,16 +207,28 @@ export async function GET(request: Request) {
 
     const phone = normalizeSitePhone(rawPhone ?? rawHotline);
     const hotline = normalizeSitePhone(rawHotline ?? rawPhone);
+    const heroBannerRows = banners.filter((banner) => banner.kind === BannerKind.HERO);
+    const popupBannerRow = banners.find((banner) => banner.kind === BannerKind.POPUP) ?? null;
 
     return NextResponse.json(
       {
         collectionLinks,
         collections,
         categoryTree,
-        heroBanners: banners.map((banner) => ({
+        heroBanners: heroBannerRows.map((banner) => ({
           src: banner.imageUrl,
           alt: banner.subtitle?.trim() || banner.title,
         })),
+        popupBanner: popupBannerRow
+          ? {
+              src: popupBannerRow.imageUrl,
+              alt: popupBannerRow.subtitle?.trim() || popupBannerRow.title,
+              title: popupBannerRow.title,
+              subtitle: popupBannerRow.subtitle,
+              ctaLabel: popupBannerRow.ctaLabel,
+              ctaHref: popupBannerRow.ctaHref,
+            }
+          : null,
         products: {
           new: newProducts,
           best: bestProducts,

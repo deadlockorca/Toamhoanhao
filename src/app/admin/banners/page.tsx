@@ -5,9 +5,12 @@ import { type FormEvent, useCallback, useEffect, useState } from "react";
 import AdminSectionNav from "@/components/AdminSectionNav";
 import R2ImageUploadField from "@/components/admin/R2ImageUploadField";
 
+type BannerKind = "HERO" | "POPUP";
+
 type AdminBanner = {
   id: string;
   slug: string;
+  kind: BannerKind;
   title: string;
   subtitle: string | null;
   imageUrl: string;
@@ -28,6 +31,7 @@ type AdminBannerResponse = {
 type BannerFormState = {
   title: string;
   slug: string;
+  kind: BannerKind;
   subtitle: string;
   imageUrl: string;
   ctaLabel: string;
@@ -39,6 +43,7 @@ type BannerFormState = {
 const emptyFormState: BannerFormState = {
   title: "",
   slug: "",
+  kind: "HERO",
   subtitle: "",
   imageUrl: "",
   ctaLabel: "",
@@ -50,6 +55,7 @@ const emptyFormState: BannerFormState = {
 const toBannerFormState = (banner: AdminBanner): BannerFormState => ({
   title: banner.title,
   slug: banner.slug,
+  kind: banner.kind,
   subtitle: banner.subtitle ?? "",
   imageUrl: banner.imageUrl,
   ctaLabel: banner.ctaLabel ?? "",
@@ -131,6 +137,7 @@ export default function AdminBannersPage() {
         body: JSON.stringify({
           title: form.title,
           slug: form.slug,
+          kind: form.kind,
           subtitle: form.subtitle,
           imageUrl: form.imageUrl,
           ctaLabel: form.ctaLabel,
@@ -203,7 +210,7 @@ export default function AdminBannersPage() {
         <section className="rounded-2xl border border-[#d9d9df] bg-white p-5 shadow-sm md:p-6">
           <h1 className="text-[22px] font-semibold text-[#191919] md:text-[28px]">Quản lý banner</h1>
           <p className="mt-2 text-[14px] text-[#5f6570]">
-            Quản trị slider trang chủ, upload ảnh trực tiếp lên R2 và sắp xếp thứ tự hiển thị.
+            Quản trị banner trang chủ (Hero) và banner Popup, upload ảnh trực tiếp lên R2.
           </p>
           <div className="mt-4">
             <AdminSectionNav />
@@ -236,6 +243,20 @@ export default function AdminBannersPage() {
                   className="w-full rounded-xl border border-[#cdd1d8] px-3 py-2.5 text-[14px] focus:border-[#222] focus:outline-none"
                   placeholder="banner-phong-khach"
                 />
+              </label>
+
+              <label className="space-y-1">
+                <span className="text-[13px] font-medium text-[#363c47]">Loại banner</span>
+                <select
+                  value={form.kind}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, kind: event.target.value as BannerKind }))
+                  }
+                  className="w-full rounded-xl border border-[#cdd1d8] bg-white px-3 py-2.5 text-[14px] focus:border-[#222] focus:outline-none"
+                >
+                  <option value="HERO">Hero (slider trang chủ)</option>
+                  <option value="POPUP">Popup (khuyến mãi nổi)</option>
+                </select>
               </label>
 
               <label className="space-y-1">
@@ -272,7 +293,7 @@ export default function AdminBannersPage() {
                 </label>
                 <R2ImageUploadField
                   value={form.imageUrl}
-                  folder="banners"
+                  folder={form.kind === "POPUP" ? "banners/popup" : "banners/hero"}
                   onUploaded={(url) => setForm((prev) => ({ ...prev, imageUrl: url }))}
                 />
               </div>
@@ -365,6 +386,7 @@ export default function AdminBannersPage() {
                 <thead className="bg-[#f7f8fb] text-[#3a4250]">
                   <tr>
                     <th className="px-3 py-2.5 font-semibold">Banner</th>
+                    <th className="px-3 py-2.5 font-semibold">Loại</th>
                     <th className="px-3 py-2.5 font-semibold">Slug</th>
                     <th className="px-3 py-2.5 font-semibold">CTA</th>
                     <th className="px-3 py-2.5 font-semibold">Thứ tự</th>
@@ -392,6 +414,17 @@ export default function AdminBannersPage() {
                             )}
                           </div>
                         </div>
+                      </td>
+                      <td className="px-3 py-3">
+                        <span
+                          className={`inline-flex w-fit rounded-full px-2 py-0.5 text-[12px] ${
+                            banner.kind === "POPUP"
+                              ? "bg-[#fff2df] text-[#8e4b04]"
+                              : "bg-[#e8f2ff] text-[#1f4f99]"
+                          }`}
+                        >
+                          {banner.kind === "POPUP" ? "Popup" : "Hero"}
+                        </span>
                       </td>
                       <td className="px-3 py-3 text-[#323843]">/{banner.slug}</td>
                       <td className="px-3 py-3 text-[#323843]">

@@ -81,6 +81,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         where: { id },
         data: {
           slug,
+          kind: parsed.data.kind,
           title: parsed.data.title,
           subtitle: parsed.data.subtitle,
           imageUrl: parsed.data.imageUrl,

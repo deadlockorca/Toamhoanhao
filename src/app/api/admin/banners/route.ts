@@ -62,6 +62,7 @@ export async function POST(request: Request) {
       return tx.banner.create({
         data: {
           slug,
+          kind: parsed.data.kind,
           title: parsed.data.title,
           subtitle: parsed.data.subtitle,
           imageUrl: parsed.data.imageUrl,

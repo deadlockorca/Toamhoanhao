@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { BannerKind, Prisma } from "@prisma/client";
 
 import { toBoolean, toCleanString, toInteger, toRecord } from "@/lib/admin-parser";
 import { slugify } from "@/lib/admin-product";
@@ -6,6 +6,7 @@ import { slugify } from "@/lib/admin-product";
 export const adminBannerSelect = {
   id: true,
   slug: true,
+  kind: true,
   title: true,
   subtitle: true,
   imageUrl: true,
@@ -24,6 +25,7 @@ export type AdminBannerRow = Prisma.BannerGetPayload<{
 export const toAdminBannerResponse = (banner: AdminBannerRow) => ({
   id: banner.id,
   slug: banner.slug,
+  kind: banner.kind,
   title: banner.title,
   subtitle: banner.subtitle,
   imageUrl: banner.imageUrl,
@@ -38,6 +40,7 @@ export const toAdminBannerResponse = (banner: AdminBannerRow) => ({
 export type BannerInput = {
   title: string;
   slugInput: string;
+  kind: BannerKind;
   subtitle: string | null;
   imageUrl: string;
   ctaLabel: string | null;
@@ -59,16 +62,20 @@ export const parseBannerInput = (
     return { ok: false, error: "Tiêu đề banner là bắt buộc." };
   }
 
-  const imageUrl = toCleanString(payload.imageUrl, 500);
+const imageUrl = toCleanString(payload.imageUrl, 500);
   if (!imageUrl) {
     return { ok: false, error: "Ảnh banner là bắt buộc." };
   }
+
+  const kindRaw = toCleanString(payload.kind, 20)?.toUpperCase();
+  const kind = kindRaw === BannerKind.POPUP ? BannerKind.POPUP : BannerKind.HERO;
 
   return {
     ok: true,
     data: {
       title,
       slugInput: toCleanString(payload.slug, 191) ?? "",
+      kind,
       subtitle: toCleanString(payload.subtitle, 191),
       imageUrl,
       ctaLabel: toCleanString(payload.ctaLabel, 120),
