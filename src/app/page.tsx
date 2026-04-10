@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
 
 function GlobeIcon() {
@@ -104,6 +104,128 @@ function MenuIcon() {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+type MobileCategoryIconKind = "table" | "sofa" | "chair" | "cabinet" | "bed" | "decor" | "home" | "outdoor";
+
+function MobileCategoryIcon({ kind }: { kind: MobileCategoryIconKind }) {
+  if (kind === "table") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M3 9h18M5 9v3m14-3v3M7 21V12m10 9V12M4 7h16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "sofa") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M4 12v5h16v-5M6 12V9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3M4 17v2M20 17v2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "chair") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M8 6h8v6H8zM7 12h10v4H7zM8 16v4m8-4v4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "cabinet") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M3.5 8h17M3.5 16h17M4 5h16v14H4zM10 8v8m4-8v8"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "bed") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M4 12h16v5H4zM6 10h4v2H6zM11 10h7v2h-7zM4 17v2m16-2v2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "decor") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M6 19h12M8.5 19v-6a3.5 3.5 0 1 1 7 0v6M12 4v3m0 5v.01"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "home") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+        <path
+          d="M4 10.5 12 4l8 6.5V20H4zM9.5 20v-5h5V20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6">
+      <path
+        d="M4 16c2.2-3 4.5-4.5 8-4.5s5.8 1.5 8 4.5M7 11l-1.2-2.2M17 11l1.2-2.2M12 8V5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -301,6 +423,24 @@ type CollectionShowcaseItem = {
   itemCount: number;
 };
 
+type MobileCategoryShortcut = {
+  id: string;
+  label: string;
+  slug: string;
+  kind: MobileCategoryIconKind;
+};
+
+const mobileCategoryShortcutPreset: MobileCategoryShortcut[] = [
+  { id: "cat-ban", label: "Bàn", slug: "ban", kind: "table" },
+  { id: "cat-sofa", label: "Sofa", slug: "sofa-ghe-thu-gian", kind: "sofa" },
+  { id: "cat-ghe", label: "Ghế", slug: "ghe", kind: "chair" },
+  { id: "cat-tu-ke", label: "Tủ kệ", slug: "tu-ke", kind: "cabinet" },
+  { id: "cat-giuong", label: "Giường", slug: "giuong", kind: "bed" },
+  { id: "cat-decor", label: "Đồ trang trí", slug: "do-trang-tri", kind: "decor" },
+  { id: "cat-home", label: "Đồ gia dụng", slug: "do-gia-dung", kind: "home" },
+  { id: "cat-outdoor", label: "Không gian", slug: "khong-gian-ngoai-troi", kind: "outdoor" },
+];
+
 const homeProductSections: Array<{
   id: ProductTabId;
   title: string;
@@ -432,6 +572,20 @@ export default function Home() {
 
   const safeCurrentSlide = totalSlides > 0 ? currentSlide % totalSlides : 0;
   const activeBanner = totalSlides > 0 ? heroBanners[safeCurrentSlide] : null;
+  const mobileCategoryShortcuts = useMemo(() => {
+    const categoriesBySlug = new Set(
+      categoryTree
+        .map((category) => category.slug?.trim())
+        .filter((slug): slug is string => typeof slug === "string" && slug.length > 0),
+    );
+
+    return mobileCategoryShortcutPreset
+      .filter((item) => categoriesBySlug.has(item.slug))
+      .map((item) => ({
+        ...item,
+        href: `/danh-muc/${item.slug}`,
+      }));
+  }, [categoryTree]);
   const activeMegaCategory =
     categoryTree.find((category) => category.name === activeMegaCategoryName) ?? categoryTree[0] ?? null;
 
@@ -1050,6 +1204,32 @@ export default function Home() {
             </div>
           ) : null}
         </section>
+
+        {mobileCategoryShortcuts.length > 0 ? (
+          <section aria-label="Danh mục nhanh trên di động" className="md:hidden">
+            <div className="border-y border-[#d7d9de] bg-[#f1f2f4]">
+              <div className="overflow-x-auto">
+                <div className="flex min-w-max items-start gap-4 px-4 py-4">
+                  {mobileCategoryShortcuts.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="flex w-[74px] shrink-0 flex-col items-center gap-2 text-center"
+                      aria-label={`Mở danh mục ${item.label}`}
+                    >
+                      <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#c7cbd4] bg-[#f5f6f8] text-[#2b3240] shadow-[0_2px_8px_rgba(15,23,42,0.08)]">
+                        <MobileCategoryIcon kind={item.kind} />
+                      </span>
+                      <span className="line-clamp-2 min-h-[2rem] text-[13px] font-medium leading-[1.2] text-[#1f2530]">
+                        {item.label}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         <section aria-label="Danh mục nổi bật" className="pb-12 pt-5">
           <div className="mx-auto w-full max-w-[1320px] px-4 md:px-6">
