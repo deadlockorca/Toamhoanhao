@@ -858,14 +858,14 @@ export default function Home() {
             <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-[22px]">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.45),rgba(255,255,255,0)_38%)]" />
               <div className="absolute bottom-0 left-0 right-0 h-[48%] bg-[repeating-linear-gradient(90deg,rgba(133,103,16,0.08)_0px,rgba(133,103,16,0.08)_1px,transparent_1px,transparent_24px)]" />
-              <div className="absolute right-[-28px] top-[208px] h-[282px] w-[282px] rounded-full bg-white/95" />
+              <div className="absolute right-[-40px] top-[196px] h-[300px] w-[300px] rounded-full bg-white/95" />
             </div>
 
             <button
               type="button"
               aria-label="Đóng"
               onClick={closePromoPopup}
-              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[22px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition hover:bg-white"
+              className="absolute right-3 top-3 z-[30] inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[22px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition hover:bg-white"
             >
               ×
             </button>
@@ -906,13 +906,13 @@ export default function Home() {
             </div>
 
             {promoImage ? (
-              <div className="pointer-events-none absolute -bottom-2 -right-[86px] z-[1] h-[268px] w-[58%] md:-right-[96px] md:h-[292px]">
+              <div className="pointer-events-none absolute -bottom-8 -right-[190px] z-[6] h-[340px] w-[420px] md:-bottom-10 md:-right-[220px] md:h-[382px] md:w-[468px]">
                 <Image
                   src={promoImage}
                   alt={popupBanner?.alt || "Ưu đãi sofa"}
                   fill
-                  sizes="320px"
-                  className="object-contain object-bottom drop-shadow-[0_14px_22px_rgba(0,0,0,0.18)]"
+                  sizes="(max-width: 768px) 420px, 468px"
+                  className="object-cover object-[86%_78%] scale-[1.16] drop-shadow-[0_16px_26px_rgba(0,0,0,0.22)]"
                 />
               </div>
             ) : null}
