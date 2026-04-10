@@ -107,6 +107,39 @@ function MenuIcon() {
   );
 }
 
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+      <path
+        d="M6 6l12 12M18 6 6 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function DisclosureIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={`h-4 w-4 text-[#617087] transition-transform ${open ? "rotate-180" : ""}`}
+    >
+      <path
+        d="m6.5 9.5 5.5 5 5.5-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function MobileRoundIcon({
   icon,
   href,
@@ -253,6 +286,75 @@ function CategoryTreeList({
   );
 }
 
+function MobileCategoryAccordion({
+  nodes,
+  expandedKeys,
+  onToggle,
+  onSelect,
+  depth = 0,
+  path = "mobile-root",
+}: {
+  nodes: CategoryNode[];
+  expandedKeys: Record<string, boolean>;
+  onToggle: (key: string) => void;
+  onSelect?: () => void;
+  depth?: number;
+  path?: string;
+}) {
+  return (
+    <ul className={depth === 0 ? "space-y-1.5" : "mt-2 space-y-1.5 border-l border-[#e8edf5] pl-3"}>
+      {nodes.map((node, index) => {
+        const key = `${path}-${index}-${node.slug ?? node.name}`;
+        const hasChildren = Boolean(node.children && node.children.length > 0);
+        const isOpen = Boolean(expandedKeys[key]);
+        const textClass =
+          depth === 0 ? "text-[13px] font-semibold text-[#263142]" : "text-[13px] font-medium text-[#344357]";
+
+        return (
+          <li key={key}>
+            <div className="flex items-center gap-2 rounded-md border border-[#e8edf5] bg-white px-2.5 py-2">
+              {node.slug ? (
+                <Link
+                  href={`/danh-muc/${node.slug}`}
+                  onClick={onSelect}
+                  className={`min-w-0 flex-1 truncate leading-5 transition hover:text-[#8f6f11] ${textClass}`}
+                >
+                  {node.name}
+                </Link>
+              ) : (
+                <span className={`min-w-0 flex-1 truncate leading-5 ${textClass}`}>{node.name}</span>
+              )}
+
+              {hasChildren ? (
+                <button
+                  type="button"
+                  aria-label={isOpen ? "Thu gọn danh mục con" : "Mở danh mục con"}
+                  aria-expanded={isOpen}
+                  onClick={() => onToggle(key)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#d8e0eb] bg-[#f8fafd]"
+                >
+                  <DisclosureIcon open={isOpen} />
+                </button>
+              ) : null}
+            </div>
+
+            {hasChildren && isOpen ? (
+              <MobileCategoryAccordion
+                nodes={node.children as CategoryNode[]}
+                expandedKeys={expandedKeys}
+                onToggle={onToggle}
+                onSelect={onSelect}
+                depth={depth + 1}
+                path={key}
+              />
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 type HomeApiPayload = {
   collectionLinks?: Array<{
     name?: string;
@@ -298,6 +400,7 @@ export default function SiteHeader() {
   const [siteBrandTagline, setSiteBrandTagline] = useState("Nội thất xuất khẩu");
   const [sitePhone, setSitePhone] = useState("0901.827.555");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileExpandedKeys, setMobileExpandedKeys] = useState<Record<string, boolean>>({});
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [activeMegaCategoryName, setActiveMegaCategoryName] = useState("");
   const megaMenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -329,6 +432,19 @@ export default function SiteHeader() {
   const closeMegaMenuNow = () => {
     clearMegaMenuCloseTimer();
     setIsMegaMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = () => {
+    if (isMobileMenuOpen) {
+      closeMobileMenu();
+      return;
+    }
+    setMobileExpandedKeys({});
+    setIsMobileMenuOpen(true);
   };
 
   useEffect(
@@ -401,6 +517,35 @@ export default function SiteHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMobileMenuOpen]);
+
+  const toggleMobileCategory = (key: string) => {
+    setMobileExpandedKeys((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const mobileMenuLinks: Array<{ label: string; href: string }> = [
     ...primaryMenu
       .slice(1)
@@ -419,8 +564,8 @@ export default function SiteHeader() {
             type="button"
             aria-label="Mở menu"
             aria-expanded={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            className="inline-flex text-[#c9a22f]"
+            onClick={toggleMobileMenu}
+            className="inline-flex text-[#cfb345] transition-transform duration-200 active:scale-95"
           >
             <MenuIcon />
           </button>
@@ -448,54 +593,6 @@ export default function SiteHeader() {
           </div>
         </div>
 
-        {isMobileMenuOpen ? (
-          <div className="border-t border-[#d7d9de] bg-white px-4 py-3">
-            <nav className="grid gap-2">
-              {mobileMenuLinks.map((item) => (
-                <Link
-                  key={`mobile-menu-${item.href}`}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="rounded-md px-2 py-1.5 text-[13px] font-semibold uppercase tracking-[0.03em] text-[#2b3240] transition hover:bg-[#f4f6fa]"
-                >
-                  {item.label}
-                </Link>
-                ))}
-              </nav>
-
-            {categoryTree.length > 0 ? (
-              <div className="mt-3 border-t border-[#eceff3] pt-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">
-                  Danh mục sản phẩm
-                </p>
-                <div className="mt-2 rounded-lg border border-[#e7ebf1] bg-[#fafbfd] p-3 normal-case">
-                  <CategoryTreeList nodes={categoryTree} onSelect={() => setIsMobileMenuOpen(false)} />
-                </div>
-              </div>
-            ) : null}
-
-            {collectionLinks.length > 0 ? (
-              <div className="mt-3 border-t border-[#eceff3] pt-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">
-                  Bộ sưu tập nổi bật
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {collectionLinks.slice(0, 6).map((item) => (
-                    <Link
-                      key={`mobile-collection-${item.slug}`}
-                      href={`/bo-suu-tap/${item.slug}`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="rounded-full border border-[#d7dbe2] px-2.5 py-1 text-[12px] font-medium text-[#3b4453]"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
         <div className="px-4 pb-3">
           <div className="flex items-center border border-[#d2d5db] bg-white px-4 py-2.5">
             <input
@@ -508,6 +605,92 @@ export default function SiteHeader() {
             </button>
           </div>
         </div>
+      </div>
+
+      <div
+        className={`fixed inset-0 z-[90] md:hidden transition-[visibility] duration-300 ${
+          isMobileMenuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
+        }`}
+        role={isMobileMenuOpen ? "dialog" : undefined}
+        aria-modal={isMobileMenuOpen ? true : undefined}
+        aria-label="Menu danh mục"
+        aria-hidden={!isMobileMenuOpen}
+      >
+        <button
+          type="button"
+          aria-label="Đóng menu"
+          onClick={closeMobileMenu}
+          className={`absolute inset-0 bg-[rgba(15,23,42,0.44)] transition-opacity duration-300 ease-out ${
+            isMobileMenuOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        <aside
+          className={`absolute left-0 top-0 flex h-full w-[85vw] max-w-[360px] flex-col bg-white shadow-[0_20px_46px_rgba(15,23,42,0.38)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+            <div className="flex items-center justify-between border-b border-[#e8ecf3] px-4 py-3">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#9a7f1a]">Danh mục sản phẩm</p>
+              <button
+                type="button"
+                onClick={closeMobileMenu}
+                aria-label="Đóng menu"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#dce3ed] bg-white text-[#4a5465]"
+              >
+                <CloseIcon />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              <nav className="grid gap-2">
+                {mobileMenuLinks.map((item) => (
+                  <Link
+                    key={`mobile-menu-${item.href}`}
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className="rounded-md border border-[#e7ebf2] px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#2b3240] transition hover:bg-[#f5f7fb]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {categoryTree.length > 0 ? (
+                <div className="mt-4 border-t border-[#eceff3] pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">Danh mục chính</p>
+                  <div className="mt-2 rounded-lg border border-[#e7ebf1] bg-[#fafbfd] p-3 normal-case">
+                    <MobileCategoryAccordion
+                      nodes={categoryTree}
+                      expandedKeys={mobileExpandedKeys}
+                      onToggle={toggleMobileCategory}
+                      onSelect={closeMobileMenu}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {collectionLinks.length > 0 ? (
+                <div className="mt-4 border-t border-[#eceff3] pt-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">
+                    Bộ sưu tập nổi bật
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {collectionLinks.slice(0, 6).map((item) => (
+                      <Link
+                        key={`mobile-collection-${item.slug}`}
+                        href={`/bo-suu-tap/${item.slug}`}
+                        onClick={closeMobileMenu}
+                        className="rounded-full border border-[#d7dbe2] px-2.5 py-1 text-[12px] font-medium text-[#3b4453]"
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </aside>
       </div>
 
       <div className="hidden bg-[#e2e4e8] md:block">

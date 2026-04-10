@@ -3,12 +3,74 @@ import Link from "next/link";
 
 type SiteFooterProps = {
   sitePhone?: string;
+  northPhone?: string;
+  southPhone?: string;
+  zaloChatUrl?: string;
 };
 
-export default function SiteFooter({ sitePhone = "0901.827.555" }: SiteFooterProps) {
+function PhoneShortcutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
+      <path
+        d="M6.7 3h3.1L11 7.2 8.8 9.1a13.7 13.7 0 0 0 6.1 6.1l1.9-2.2 4.2 1.2v3.1a1.7 1.7 0 0 1-1.8 1.7A16.2 16.2 0 0 1 5 4.8 1.7 1.7 0 0 1 6.7 3Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ZaloShortcutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
+      <path
+        d="M3.5 6.8A2.3 2.3 0 0 1 5.8 4.5h12.4a2.3 2.3 0 0 1 2.3 2.3v7.9a2.3 2.3 0 0 1-2.3 2.3h-4l-4.3 3v-3H5.8a2.3 2.3 0 0 1-2.3-2.3Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 9h2.8l-2.8 4H11m2-4v4m3.3-4L14 13h2.7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+const toDigits = (value: string) => value.replace(/\D/g, "");
+
+const toTelHref = (phone: string) => {
+  const digits = toDigits(phone);
+  return digits ? `tel:${digits}` : "tel:";
+};
+
+export default function SiteFooter({
+  sitePhone = "0901.827.555",
+  northPhone,
+  southPhone,
+  zaloChatUrl,
+}: SiteFooterProps) {
+  const envNorthPhone = process.env.NEXT_PUBLIC_CONTACT_NORTH_PHONE?.trim();
+  const envSouthPhone = process.env.NEXT_PUBLIC_CONTACT_SOUTH_PHONE?.trim();
+  const envZaloChatUrl = process.env.NEXT_PUBLIC_ZALO_CHAT_URL?.trim();
+
+  const northContact = northPhone?.trim() || envNorthPhone || sitePhone;
+  const southContact = southPhone?.trim() || envSouthPhone || sitePhone;
+  const zaloTargetPhone = toDigits(envNorthPhone || northContact || sitePhone);
+  const zaloHref = zaloChatUrl?.trim() || envZaloChatUrl || (zaloTargetPhone ? `https://zalo.me/${zaloTargetPhone}` : "#");
+
   return (
     <footer className="border-t border-[#e2e2e5] bg-[#f1f2f4]">
-      <div className="mx-auto w-full max-w-[1320px] px-4 pb-7 pt-12 md:px-6 md:pb-8 md:pt-14">
+      <div className="mx-auto w-full max-w-[1320px] px-4 pb-24 pt-12 md:px-6 md:pb-8 md:pt-14">
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.15fr_0.9fr_0.9fr_1fr]">
           <section className="space-y-4 text-[#1f2530]">
             <h3 className="text-[15px] font-extrabold uppercase tracking-[0.02em] md:text-[17px]">Hỗ trợ và liên hệ</h3>
@@ -163,6 +225,42 @@ export default function SiteFooter({ sitePhone = "0901.827.555" }: SiteFooterPro
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-[95] border-t border-[#d7dce4] bg-white/95 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur md:hidden">
+        <div className="grid grid-cols-3">
+          <a
+            href={toTelHref(northContact)}
+            className="flex min-h-[66px] items-center justify-center gap-2 border-r border-[#e6eaf1] px-2 text-[#243145]"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f5f9] text-[#28374b]">
+              <PhoneShortcutIcon />
+            </span>
+            <span className="text-center text-[11px] font-semibold leading-[1.2]">Liên hệ miền Bắc</span>
+          </a>
+
+          <a
+            href={zaloHref}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-[66px] items-center justify-center gap-2 border-r border-[#e6eaf1] px-2 text-[#015ea7]"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#ebf6ff] text-[#0074cf]">
+              <ZaloShortcutIcon />
+            </span>
+            <span className="text-center text-[11px] font-semibold leading-[1.2]">Zalo Chat</span>
+          </a>
+
+          <a
+            href={toTelHref(southContact)}
+            className="flex min-h-[66px] items-center justify-center gap-2 px-2 text-[#243145]"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f5f9] text-[#28374b]">
+              <PhoneShortcutIcon />
+            </span>
+            <span className="text-center text-[11px] font-semibold leading-[1.2]">Liên hệ miền Nam</span>
+          </a>
         </div>
       </div>
     </footer>
