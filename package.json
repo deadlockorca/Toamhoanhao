@@ -14,6 +14,8 @@
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "import:folders": "tsx scripts/import-products-from-folders.ts",
+    "prices:backfill": "tsx scripts/backfill-product-prices-from-choixe.ts",
+    "prices:backfill:sql": "tsx scripts/backfill-product-prices-from-sql-dump.ts",
     "collections:bootstrap": "tsx scripts/bootstrap-collections-from-categories.ts",
     "fix:node503": "bash scripts/fix-node-503.sh"
   },
