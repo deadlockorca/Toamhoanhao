@@ -746,11 +746,11 @@ export default function Home() {
                                 ) : null}
                               </div>
 
-                              <div className="space-y-1 p-2.5 pt-3 md:space-y-2 md:p-4">
+                              <div className="space-y-1 p-2.5 pt-3 text-center md:space-y-2 md:p-4">
                                 <h4 className="min-h-[3.1rem] text-[12px] font-extrabold uppercase leading-[1.35] tracking-[0.01em] text-[#212738] md:min-h-[2.75rem] md:text-[15px] md:font-semibold md:normal-case md:tracking-normal md:text-[#1f2937]">
                                   {product.name}
                                 </h4>
-                                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
                                   {isContactPrice(product.price, product.originalPrice) ? (
                                     <span className="whitespace-nowrap text-[12px] font-extrabold leading-none tracking-[-0.01em] text-[#2da23e] md:text-[17px] md:font-bold md:text-[#bf1f15]">
                                       Liên Hệ

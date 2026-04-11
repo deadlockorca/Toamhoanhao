@@ -1,4 +1,4 @@
-import { ProductStatus, ProductTab } from "@prisma/client";
+import { BannerKind, ProductStatus, ProductTab } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
@@ -129,6 +129,37 @@ export type PublicCollectionCard = {
   description: string | null;
   imageUrl: string | null;
   itemCount: number;
+};
+
+export type PublicCategoryBanner = {
+  imageUrl: string;
+  title: string;
+  subtitle: string | null;
+};
+
+export const getActiveCategoryBanner = async (): Promise<PublicCategoryBanner | null> => {
+  const banner = await prisma.banner.findFirst({
+    where: {
+      isActive: true,
+      kind: BannerKind.CATEGORY,
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: {
+      imageUrl: true,
+      title: true,
+      subtitle: true,
+    },
+  });
+
+  if (!banner?.imageUrl?.trim()) {
+    return null;
+  }
+
+  return {
+    imageUrl: banner.imageUrl.trim(),
+    title: banner.title,
+    subtitle: banner.subtitle,
+  };
 };
 
 export const getActiveCollections = async (take = 30) => {

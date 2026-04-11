@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { BannerKind } from "@prisma/client";
 
 import {
   adminBannerSelect,
@@ -7,6 +8,7 @@ import {
   toAdminBannerResponse,
   type AdminBannerRow,
 } from "@/lib/admin-banner";
+import { ensureBannerKindSchema, toBannerSchemaErrorMessage } from "@/lib/banner-schema";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -56,8 +58,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
+    await ensureBannerKindSchema();
+
     const created = await prisma.$transaction(async (tx) => {
       const slug = await resolveBannerSlug(tx, parsed.data.slugInput, parsed.data.title);
+
+      if (parsed.data.kind === BannerKind.CATEGORY && parsed.data.isActive) {
+        await tx.banner.updateMany({
+          where: {
+            kind: BannerKind.CATEGORY,
+            isActive: true,
+          },
+          data: {
+            isActive: false,
+          },
+        });
+      }
 
       return tx.banner.create({
         data: {
@@ -80,7 +96,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Không thể tạo banner.";
+    const message = toBannerSchemaErrorMessage(error, "Không thể tạo banner.");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

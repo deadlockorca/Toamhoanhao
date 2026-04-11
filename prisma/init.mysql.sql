@@ -44,6 +44,7 @@ CREATE TABLE `Product` (
 CREATE TABLE `Banner` (
     `id` VARCHAR(191) NOT NULL,
     `slug` VARCHAR(191) NOT NULL,
+    `kind` ENUM('HERO', 'POPUP', 'CATEGORY') NOT NULL DEFAULT 'HERO',
     `title` VARCHAR(191) NOT NULL,
     `subtitle` VARCHAR(191) NULL,
     `imageUrl` VARCHAR(191) NOT NULL,

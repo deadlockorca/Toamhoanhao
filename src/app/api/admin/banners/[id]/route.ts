@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { BannerKind } from "@prisma/client";
 
 import {
   adminBannerSelect,
@@ -7,6 +8,7 @@ import {
   toAdminBannerResponse,
   type AdminBannerRow,
 } from "@/lib/admin-banner";
+import { ensureBannerKindSchema, toBannerSchemaErrorMessage } from "@/lib/banner-schema";
 import { prisma } from "@/lib/prisma";
 import { deleteImagesFromR2ByUrls } from "@/lib/r2";
 
@@ -62,6 +64,8 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
+    await ensureBannerKindSchema();
+
     const existingBanner = await prisma.banner.findUnique({
       where: { id },
       select: {
@@ -76,6 +80,21 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     const updated = await prisma.$transaction(async (tx) => {
       const slug = await resolveBannerSlug(tx, parsed.data.slugInput, parsed.data.title, id);
+
+      if (parsed.data.kind === BannerKind.CATEGORY && parsed.data.isActive) {
+        await tx.banner.updateMany({
+          where: {
+            kind: BannerKind.CATEGORY,
+            isActive: true,
+            NOT: {
+              id,
+            },
+          },
+          data: {
+            isActive: false,
+          },
+        });
+      }
 
       return tx.banner.update({
         where: { id },
@@ -107,7 +126,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       ...cleanupPayload,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Không thể cập nhật banner.";
+    const message = toBannerSchemaErrorMessage(error, "Không thể cập nhật banner.");
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

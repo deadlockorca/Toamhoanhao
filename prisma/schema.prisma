@@ -107,6 +107,7 @@ enum StoreLocationType {
 enum BannerKind {
   HERO
   POPUP
+  CATEGORY
 }
 
 model Category {

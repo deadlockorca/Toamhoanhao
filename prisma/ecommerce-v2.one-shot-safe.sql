@@ -208,6 +208,38 @@ SET @sql := IF(
 );
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
+-- Banner.kind
+SET @banner_table_exists := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.TABLES
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'Banner'
+);
+SET @exists := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'Banner'
+    AND COLUMN_NAME = 'kind'
+);
+SET @sql := IF(
+  @banner_table_exists = 0,
+  "SELECT 'skip Banner table missing'",
+  IF(
+    @exists = 0,
+    "ALTER TABLE `Banner` ADD COLUMN `kind` ENUM('HERO','POPUP','CATEGORY') NOT NULL DEFAULT 'HERO' AFTER `slug`",
+    "SELECT 'skip Banner.kind add column'"
+  )
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @sql := IF(
+  @banner_table_exists = 0,
+  "SELECT 'skip Banner table missing'",
+  "ALTER TABLE `Banner` MODIFY COLUMN `kind` ENUM('HERO','POPUP','CATEGORY') NOT NULL DEFAULT 'HERO'"
+);
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
 -- ------------------------------------------------------------
 -- 2) Create missing V2 tables
 -- ------------------------------------------------------------

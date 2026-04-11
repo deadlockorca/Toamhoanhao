@@ -68,7 +68,12 @@ const imageUrl = toCleanString(payload.imageUrl, 500);
   }
 
   const kindRaw = toCleanString(payload.kind, 20)?.toUpperCase();
-  const kind = kindRaw === BannerKind.POPUP ? BannerKind.POPUP : BannerKind.HERO;
+  const kind =
+    kindRaw === BannerKind.POPUP
+      ? BannerKind.POPUP
+      : kindRaw === BannerKind.CATEGORY
+        ? BannerKind.CATEGORY
+        : BannerKind.HERO;
 
   return {
     ok: true,

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import PublicProductGridPage from "@/components/PublicProductGridPage";
-import { getProductsByCategorySlug } from "@/lib/public-catalog";
+import { getActiveCategoryBanner, getProductsByCategorySlug } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,10 @@ export default async function CategoryDetailPage({ params }: PageProps) {
     redirect("/danh-muc/ghe");
   }
 
-  const data = await getProductsByCategorySlug(slug, 120);
+  const [data, categoryBanner] = await Promise.all([
+    getProductsByCategorySlug(slug, 120),
+    getActiveCategoryBanner(),
+  ]);
 
   if (!data) {
     notFound();
@@ -33,7 +36,17 @@ export default async function CategoryDetailPage({ params }: PageProps) {
         data.category.description ??
         "Danh sách sản phẩm theo danh mục đã chọn, bao gồm cả các nhóm con."
       }
+      topBanner={
+        categoryBanner
+          ? {
+              src: categoryBanner.imageUrl,
+              alt: categoryBanner.subtitle?.trim() || categoryBanner.title,
+            }
+          : null
+      }
       products={data.products}
+      mobilePageSize={8}
+      desktopPageSize={20}
       emptyMessage="Danh mục này hiện chưa có sản phẩm hiển thị."
     />
   );

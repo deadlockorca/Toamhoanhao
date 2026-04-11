@@ -5,7 +5,7 @@ import { type FormEvent, useCallback, useEffect, useState } from "react";
 import AdminSectionNav from "@/components/AdminSectionNav";
 import R2ImageUploadField from "@/components/admin/R2ImageUploadField";
 
-type BannerKind = "HERO" | "POPUP";
+type BannerKind = "HERO" | "POPUP" | "CATEGORY";
 
 type AdminBanner = {
   id: string;
@@ -210,7 +210,7 @@ export default function AdminBannersPage() {
         <section className="rounded-2xl border border-[#d9d9df] bg-white p-5 shadow-sm md:p-6">
           <h1 className="text-[22px] font-semibold text-[#191919] md:text-[28px]">Quản lý banner</h1>
           <p className="mt-2 text-[14px] text-[#5f6570]">
-            Quản trị banner trang chủ (Hero) và banner Popup, upload ảnh trực tiếp lên R2.
+            Quản trị banner trang chủ (Hero), banner Popup và banner trang danh mục, upload ảnh trực tiếp lên R2.
           </p>
           <div className="mt-4">
             <AdminSectionNav />
@@ -256,6 +256,7 @@ export default function AdminBannersPage() {
                 >
                   <option value="HERO">Hero (slider trang chủ)</option>
                   <option value="POPUP">Popup (khuyến mãi nổi)</option>
+                  <option value="CATEGORY">Banner chung trang danh mục</option>
                 </select>
               </label>
 
@@ -293,7 +294,13 @@ export default function AdminBannersPage() {
                 </label>
                 <R2ImageUploadField
                   value={form.imageUrl}
-                  folder={form.kind === "POPUP" ? "banners/popup" : "banners/hero"}
+                  folder={
+                    form.kind === "POPUP"
+                      ? "banners/popup"
+                      : form.kind === "CATEGORY"
+                        ? "banners/category"
+                        : "banners/hero"
+                  }
                   onUploaded={(url) => setForm((prev) => ({ ...prev, imageUrl: url }))}
                 />
               </div>
@@ -420,10 +427,12 @@ export default function AdminBannersPage() {
                           className={`inline-flex w-fit rounded-full px-2 py-0.5 text-[12px] ${
                             banner.kind === "POPUP"
                               ? "bg-[#fff2df] text-[#8e4b04]"
-                              : "bg-[#e8f2ff] text-[#1f4f99]"
+                              : banner.kind === "CATEGORY"
+                                ? "bg-[#ebf8f2] text-[#1f7a42]"
+                                : "bg-[#e8f2ff] text-[#1f4f99]"
                           }`}
                         >
-                          {banner.kind === "POPUP" ? "Popup" : "Hero"}
+                          {banner.kind === "POPUP" ? "Popup" : banner.kind === "CATEGORY" ? "Danh mục" : "Hero"}
                         </span>
                       </td>
                       <td className="px-3 py-3 text-[#323843]">/{banner.slug}</td>

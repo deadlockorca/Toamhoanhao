@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import PublicProductGridPage from "@/components/PublicProductGridPage";
-import { getCollectionBySlug, getProductsByCollectionId } from "@/lib/public-catalog";
+import { getActiveCategoryBanner, getCollectionBySlug, getProductsByCollectionId } from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,10 @@ export default async function CollectionDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const products = await getProductsByCollectionId(collection.id, 72);
+  const [products, categoryBanner] = await Promise.all([
+    getProductsByCollectionId(collection.id, 72),
+    getActiveCategoryBanner(),
+  ]);
 
   return (
     <PublicProductGridPage
@@ -27,7 +30,17 @@ export default async function CollectionDetailPage({ params }: PageProps) {
       breadcrumbLabel={collection.name}
       badgeLabel="Collection detail"
       subtitle={collection.description ?? "Danh sách sản phẩm thuộc bộ sưu tập này."}
+      topBanner={
+        categoryBanner
+          ? {
+              src: categoryBanner.imageUrl,
+              alt: categoryBanner.subtitle?.trim() || categoryBanner.title,
+            }
+          : null
+      }
       products={products}
+      mobilePageSize={8}
+      desktopPageSize={20}
       emptyMessage="Bộ sưu tập này chưa có sản phẩm hiển thị."
     />
   );

@@ -1,4 +1,4 @@
-import { PrismaClient, ProductTab } from "@prisma/client";
+import { BannerKind, PrismaClient, ProductTab } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -286,6 +286,7 @@ const products: SeedProduct[] = [
 const banners = [
   {
     slug: "banner-phong-khach",
+    kind: BannerKind.HERO,
     title: "Banner phòng khách cao cấp",
     subtitle: "Nâng tầm không gian sống cùng nội thất xuất Âu.",
     imageUrl: toR2BannerUrl("slider-1.jpg"),
@@ -293,6 +294,7 @@ const banners = [
   },
   {
     slug: "banner-phong-ngu",
+    kind: BannerKind.HERO,
     title: "Banner nội thất phòng ngủ",
     subtitle: "Thiết kế hiện đại, chất liệu cao cấp.",
     imageUrl: toR2BannerUrl("slider-2.jpg"),
@@ -300,6 +302,7 @@ const banners = [
   },
   {
     slug: "banner-lavabo",
+    kind: BannerKind.HERO,
     title: "Bộ sưu tập Lavabo mới về",
     subtitle: "Tổ Ấm Hoàn Hảo tuyển chọn mẫu đẹp mỗi tuần.",
     imageUrl: toR2BannerUrl("hero-banner.jpg"),
@@ -307,10 +310,19 @@ const banners = [
   },
   {
     slug: "banner-bo-suu-tap",
+    kind: BannerKind.HERO,
     title: "Banner bộ sưu tập nội thất",
     subtitle: "Ưu đãi nổi bật theo từng không gian.",
     imageUrl: toR2BannerUrl("slider-5.jpg"),
     sortOrder: 4,
+  },
+  {
+    slug: "banner-danh-muc",
+    kind: BannerKind.CATEGORY,
+    title: "Banner chung trang danh mục",
+    subtitle: "Nội thất xuất Âu cho mọi không gian sống.",
+    imageUrl: toR2BannerUrl("hero-banner.jpg"),
+    sortOrder: 1,
   },
 ];
 
@@ -388,6 +400,7 @@ async function main() {
     await prisma.banner.upsert({
       where: { slug: banner.slug },
       update: {
+        kind: banner.kind,
         title: banner.title,
         subtitle: banner.subtitle,
         imageUrl: banner.imageUrl,
@@ -396,6 +409,7 @@ async function main() {
       },
       create: {
         slug: banner.slug,
+        kind: banner.kind,
         title: banner.title,
         subtitle: banner.subtitle,
         imageUrl: banner.imageUrl,
