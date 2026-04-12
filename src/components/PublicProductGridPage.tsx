@@ -1,16 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import PublicProductGrid from "@/components/PublicProductGrid";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
-import { type PublicProductCard } from "@/lib/public-catalog";
+import { getPublicSidebarCategoryLinks, type PublicProductCard } from "@/lib/public-catalog";
 
 type PublicProductGridPageProps = {
   title: string;
   breadcrumbLabel: string;
   subtitle?: string;
   badgeLabel?: string;
+  activeMenuKey?: string;
   products: PublicProductCard[];
   emptyMessage?: string;
   mobilePageSize?: number;
@@ -21,17 +21,20 @@ type PublicProductGridPageProps = {
   } | null;
 };
 
-export default function PublicProductGridPage({
+export default async function PublicProductGridPage({
   title,
   breadcrumbLabel,
   subtitle,
   badgeLabel,
+  activeMenuKey,
   products,
   emptyMessage = "Chưa có sản phẩm để hiển thị.",
   mobilePageSize,
   desktopPageSize,
   topBanner,
 }: PublicProductGridPageProps) {
+  const sidebarCategories = await getPublicSidebarCategoryLinks();
+
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
       <SiteHeader />
@@ -46,34 +49,18 @@ export default function PublicProductGridPage({
             <span className="text-[#c4a235]">{breadcrumbLabel}</span>
           </nav>
 
-          {topBanner?.src ? (
-            <section className="mb-7 overflow-hidden rounded-2xl border border-[#e3e5ea] bg-white">
-              <div className="relative aspect-[2000/760] w-full">
-                <Image
-                  src={topBanner.src}
-                  alt={topBanner.alt?.trim() || title}
-                  fill
-                  sizes="(max-width: 1320px) 100vw, 1320px"
-                  className="object-cover"
-                />
-              </div>
-            </section>
-          ) : null}
-
-          <section className="rounded-2xl border border-[#e5e6ea] bg-white p-5 md:p-8">
-            {badgeLabel ? (
-              <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#9a7f1a]">{badgeLabel}</p>
-            ) : null}
-            <h1 className="mt-1 text-[30px] font-light tracking-[0.02em] text-[#20242a] md:text-[42px]">{title}</h1>
-            <div className="mt-3 h-[3px] w-[92px] bg-[#e5cf62]" />
-            {subtitle ? <p className="mt-5 max-w-[880px] text-[15px] leading-[1.6] text-[#4f5968]">{subtitle}</p> : null}
-            <PublicProductGrid
-              products={products}
-              emptyMessage={emptyMessage}
-              mobilePageSize={mobilePageSize}
-              desktopPageSize={desktopPageSize}
-            />
-          </section>
+          <PublicProductGrid
+            title={title}
+            subtitle={subtitle}
+            badgeLabel={badgeLabel}
+            activeMenuKey={activeMenuKey}
+            topBanner={topBanner}
+            sidebarCategories={sidebarCategories}
+            products={products}
+            emptyMessage={emptyMessage}
+            mobilePageSize={mobilePageSize}
+            desktopPageSize={desktopPageSize}
+          />
         </div>
       </main>
 

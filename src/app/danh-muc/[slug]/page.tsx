@@ -32,6 +32,7 @@ export default async function CategoryDetailPage({ params }: PageProps) {
       title={data.category.name}
       breadcrumbLabel={data.category.name}
       badgeLabel="Danh mục sản phẩm"
+      activeMenuKey={`category:${slug}`}
       subtitle={
         data.category.description ??
         "Danh sách sản phẩm theo danh mục đã chọn, bao gồm cả các nhóm con."

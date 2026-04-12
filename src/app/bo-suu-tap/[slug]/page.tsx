@@ -29,6 +29,7 @@ export default async function CollectionDetailPage({ params }: PageProps) {
       title={collection.name}
       breadcrumbLabel={collection.name}
       badgeLabel="Collection detail"
+      activeMenuKey="collections"
       subtitle={collection.description ?? "Danh sách sản phẩm thuộc bộ sưu tập này."}
       topBanner={
         categoryBanner

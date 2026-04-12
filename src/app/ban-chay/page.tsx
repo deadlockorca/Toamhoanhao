@@ -11,6 +11,7 @@ export default async function BestSellerPage() {
       title="Sản phẩm bán chạy"
       breadcrumbLabel="Bán chạy nhất"
       badgeLabel="Best seller"
+      activeMenuKey="best"
       subtitle="Các mẫu được khách hàng quan tâm và mua nhiều, ưu tiên hiển thị theo dữ liệu bán hàng."
       topBanner={
         categoryBanner

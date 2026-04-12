@@ -137,6 +137,11 @@ export type PublicCategoryBanner = {
   subtitle: string | null;
 };
 
+export type PublicSidebarCategoryLink = {
+  name: string;
+  slug: string;
+};
+
 export const getActiveCategoryBanner = async (): Promise<PublicCategoryBanner | null> => {
   const banner = await prisma.banner.findFirst({
     where: {
@@ -160,6 +165,26 @@ export const getActiveCategoryBanner = async (): Promise<PublicCategoryBanner | 
     title: banner.title,
     subtitle: banner.subtitle,
   };
+};
+
+export const getPublicSidebarCategoryLinks = async (take = 36): Promise<PublicSidebarCategoryLink[]> => {
+  const categories = await prisma.category.findMany({
+    where: {
+      isActive: true,
+      parentId: null,
+    },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    take,
+    select: {
+      name: true,
+      slug: true,
+    },
+  });
+
+  return categories.map((category) => ({
+    name: category.name,
+    slug: category.slug,
+  }));
 };
 
 export const getActiveCollections = async (take = 30) => {

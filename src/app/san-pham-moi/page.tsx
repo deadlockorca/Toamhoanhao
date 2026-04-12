@@ -11,6 +11,7 @@ export default async function NewProductsPage() {
       title="Sản phẩm mới"
       breadcrumbLabel="Sản phẩm mới"
       badgeLabel="New arrivals"
+      activeMenuKey="new"
       subtitle="Những sản phẩm vừa được cập nhật mới nhất trên hệ thống."
       topBanner={
         categoryBanner

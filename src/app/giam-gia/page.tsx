@@ -11,6 +11,7 @@ export default async function SaleProductsPage() {
       title="Sản phẩm giảm giá"
       breadcrumbLabel="Giảm giá"
       badgeLabel="Ưu đãi nổi bật"
+      activeMenuKey="sale"
       subtitle="Danh sách sản phẩm đang có ưu đãi tốt. Giá hiển thị đã đồng bộ theo dữ liệu quản trị."
       topBanner={
         categoryBanner
