@@ -651,7 +651,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)]">
+    <header className="sticky top-0 z-[90] bg-white shadow-[0_1px_0_rgba(0,0,0,0.04)] md:static md:z-auto">
       <div className="border-b border-[#d7d9de] bg-[#f1f2f4] md:hidden">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <button

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { shouldUseSecureCookie } from "@/lib/auth";
+import { createPublicUrl } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,11 @@ const resolveRedirectUri = (request: Request) => {
     return configured;
   }
 
-  return new URL("/api/auth/google/callback", request.url).toString();
+  return createPublicUrl(request, "/api/auth/google/callback").toString();
 };
 
 const redirectToAccountWithError = (request: Request, errorCode: string) => {
-  const url = new URL("/tai-khoan", request.url);
+  const url = createPublicUrl(request, "/tai-khoan");
   url.searchParams.set("oauthError", errorCode);
   return NextResponse.redirect(url);
 };

@@ -206,6 +206,7 @@ Thêm biến môi trường:
 ```env
 GOOGLE_CLIENT_ID="your_google_client_id"
 GOOGLE_CLIENT_SECRET="your_google_client_secret"
+APP_BASE_URL="https://your-domain.com"
 
 # Optional: nếu bỏ trống sẽ tự dùng <origin>/api/auth/google/callback
 GOOGLE_REDIRECT_URI="https://your-domain.com/api/auth/google/callback"

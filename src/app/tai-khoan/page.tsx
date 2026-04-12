@@ -510,39 +510,6 @@ export default function AccountPage() {
               </div>
             ) : (
               <form onSubmit={handleAuth} className="mx-auto mt-7 max-w-[760px]">
-                <div className="mb-5">
-                  <a
-                    href="/api/auth/google/start"
-                    className="inline-flex w-full items-center justify-center gap-3 rounded-[4px] border border-[#d9d9d9] bg-white px-4 py-3 text-[14px] font-semibold text-[#2f3745] transition hover:bg-[#f7f7f8] md:text-[15px]"
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-                      <path
-                        d="M21.8 12.23c0-.68-.06-1.33-.18-1.95H12v3.69h5.5a4.7 4.7 0 0 1-2.04 3.09v2.56h3.3c1.93-1.78 3.04-4.41 3.04-7.39Z"
-                        fill="#4285F4"
-                      />
-                      <path
-                        d="M12 22c2.76 0 5.07-.91 6.76-2.47l-3.3-2.56c-.92.62-2.08.99-3.46.99-2.67 0-4.93-1.8-5.74-4.23H2.85v2.64A9.99 9.99 0 0 0 12 22Z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M6.26 13.73a5.98 5.98 0 0 1 0-3.46V7.63H2.85a9.99 9.99 0 0 0 0 8.74l3.41-2.64Z"
-                        fill="#FBBC04"
-                      />
-                      <path
-                        d="M12 6.04c1.5 0 2.85.52 3.91 1.53l2.93-2.93C17.06 2.99 14.75 2 12 2A9.99 9.99 0 0 0 2.85 7.63l3.41 2.64C7.07 7.84 9.33 6.04 12 6.04Z"
-                        fill="#EA4335"
-                      />
-                    </svg>
-                    Tiếp tục với Google
-                  </a>
-                </div>
-
-                <div className="mb-5 flex items-center gap-3">
-                  <span className="h-px flex-1 bg-[#d9d9d9]" />
-                  <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a92a0]">Hoặc</span>
-                  <span className="h-px flex-1 bg-[#d9d9d9]" />
-                </div>
-
                 {mode === "register" ? (
                   <div className="mb-5">
                     <label className="mb-2 block text-[15px] font-semibold text-[#3f4754] md:text-[16px]" htmlFor="fullName">
