@@ -369,12 +369,12 @@ export default function ProductDetailView({ product, relatedProducts, sitePhone 
           </div>
 
           {relatedProducts.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory sm:grid sm:overflow-visible sm:pb-0 sm:snap-none sm:grid-cols-2 lg:grid-cols-4">
               {relatedProducts.map((related) => (
                 <Link
                   key={related.id}
                   href={`/san-pham/${related.slug}`}
-                  className="group overflow-hidden rounded-2xl border border-[#e7e8ec] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)]"
+                  className="group w-[calc(50%-0.5rem)] shrink-0 snap-start overflow-hidden rounded-2xl border border-[#e7e8ec] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)] sm:w-auto sm:shrink"
                 >
                   <div className="relative aspect-square overflow-hidden bg-[#f3f4f6]">
                     <Image

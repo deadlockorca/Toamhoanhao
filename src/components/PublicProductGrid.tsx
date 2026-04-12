@@ -103,6 +103,34 @@ function SidebarArrow({ open }: { open: boolean }) {
   );
 }
 
+function FloatingFilterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
+      <path
+        d="M4 6h16M7 12h10M10 18h4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function PanelCloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
+      <path
+        d="M6 6 18 18M18 6 6 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function PublicProductGrid({
   title,
   subtitle,
@@ -120,6 +148,7 @@ export default function PublicProductGrid({
   const [sortKey, setSortKey] = useState<SortKey>("newest");
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [isCategoryListOpen, setIsCategoryListOpen] = useState(true);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   useEffect(() => {
     if (!mobilePageSize) {
@@ -129,6 +158,9 @@ export default function PublicProductGrid({
     const mediaQuery = window.matchMedia(MOBILE_MAX_WIDTH_QUERY);
     const syncViewport = () => {
       setIsMobileViewport(mediaQuery.matches);
+      if (!mediaQuery.matches) {
+        setIsMobileFilterOpen(false);
+      }
     };
 
     syncViewport();
@@ -228,6 +260,18 @@ export default function PublicProductGrid({
       prev.includes(rangeId) ? prev.filter((item) => item !== rangeId) : [...prev, rangeId],
     );
   };
+
+  const applySort = (nextSortKey: SortKey) => {
+    if (sortKey === nextSortKey) {
+      return;
+    }
+
+    setCurrentPage(1);
+    setSortKey(nextSortKey);
+  };
+
+  const activeSortLabel = SORT_OPTIONS.find((option) => option.key === sortKey)?.label ?? "Hàng mới";
+  const hasMobileFilter = sidebarCategories.length > 0 || PRICE_FILTERS.length > 0;
 
   return (
     <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -336,37 +380,53 @@ export default function PublicProductGrid({
           </div>
         ) : null}
 
-        <div className="mt-4 hidden flex-wrap items-center gap-x-4 gap-y-2 border-y border-[#e4e7ee] py-3 sm:flex">
-          <span className="text-[14px] font-semibold text-[#3e4654]">Ưu tiên theo:</span>
-          {SORT_OPTIONS.map((option) => {
-            const active = sortKey === option.key;
-
-            return (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => {
-                  if (sortKey === option.key) {
-                    return;
-                  }
-                  setCurrentPage(1);
-                  setSortKey(option.key);
-                }}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px] transition ${
-                  active
-                    ? "border-[#cfb45d] bg-[#fbf7e8] font-semibold text-[#9a7d15]"
-                    : "border-[#d8dde6] bg-white text-[#465061] hover:border-[#c4cbd7]"
-                }`}
+        <div className="mt-4 border-y border-[#e4e7ee] py-3">
+          <div className="sm:hidden">
+            <label className="block">
+              <span className="mb-1 block text-[12px] font-semibold uppercase tracking-[0.04em] text-[#6a7384]">
+                Ưu tiên theo
+              </span>
+              <select
+                value={sortKey}
+                onChange={(event) => applySort(event.target.value as SortKey)}
+                className="h-11 w-full appearance-auto rounded-lg border border-[#d8dde6] bg-white px-3 text-[14px] font-semibold text-[#2f3745] shadow-[0_1px_2px_rgba(15,23,42,0.04)] focus:border-[#cfb45d] focus:outline-none focus:ring-2 focus:ring-[#f3e5ad]"
               >
-                <span
-                  className={`h-3.5 w-3.5 rounded-full border ${
-                    active ? "border-[#be9a20] bg-[#be9a20]" : "border-[#adb5c3] bg-white"
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="mt-1 text-[12px] text-[#7b8493]">Đang chọn: {activeSortLabel}</p>
+          </div>
+
+          <div className="hidden items-center gap-2 overflow-x-auto pb-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:gap-y-2 sm:overflow-visible sm:pb-0">
+            <span className="shrink-0 text-[14px] font-semibold text-[#3e4654]">Ưu tiên theo:</span>
+            {SORT_OPTIONS.map((option) => {
+              const active = sortKey === option.key;
+
+              return (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => applySort(option.key)}
+                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px] transition ${
+                    active
+                      ? "border-[#cfb45d] bg-[#fbf7e8] font-semibold text-[#9a7d15]"
+                      : "border-[#d8dde6] bg-white text-[#465061] hover:border-[#c4cbd7]"
                   }`}
-                />
-                <span>{option.label}</span>
-              </button>
-            );
-          })}
+                >
+                  <span
+                    className={`h-3.5 w-3.5 rounded-full border ${
+                      active ? "border-[#be9a20] bg-[#be9a20]" : "border-[#adb5c3] bg-white"
+                    }`}
+                  />
+                  <span>{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {filteredAndSortedProducts.length === 0 ? (
@@ -449,6 +509,127 @@ export default function PublicProductGrid({
           </>
         )}
       </section>
+
+      {hasMobileFilter ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setIsMobileFilterOpen(true)}
+            className="fixed right-0 top-[58%] z-[96] inline-flex h-12 items-center gap-2 rounded-l-full border border-r-0 border-[#d1d8e3] bg-white px-3 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#394457] shadow-[0_10px_20px_rgba(15,23,42,0.14)] transition hover:bg-[#fafbfc] sm:hidden"
+            aria-label="Mở bộ lọc sản phẩm"
+          >
+            <FloatingFilterIcon />
+            <span>Lọc</span>
+          </button>
+
+          <div
+            className={`fixed inset-0 z-[120] transition-[visibility] duration-200 sm:hidden ${
+              isMobileFilterOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
+            }`}
+            aria-hidden={!isMobileFilterOpen}
+          >
+            <button
+              type="button"
+              onClick={() => setIsMobileFilterOpen(false)}
+              aria-label="Đóng bộ lọc"
+              className={`absolute inset-0 bg-[rgba(15,23,42,0.44)] transition-opacity duration-200 ${
+                isMobileFilterOpen ? "opacity-100" : "opacity-0"
+              }`}
+            />
+
+            <aside
+              className={`absolute right-0 top-0 flex h-full w-[86vw] max-w-[350px] flex-col bg-white shadow-[-20px_0_40px_rgba(15,23,42,0.2)] transition-transform duration-300 ${
+                isMobileFilterOpen ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              <div className="flex items-center justify-between border-b border-[#e6eaf1] px-4 py-3">
+                <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">Bộ lọc sản phẩm</p>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#dce3ed] bg-white text-[#4a5465]"
+                  aria-label="Đóng bộ lọc"
+                >
+                  <PanelCloseIcon />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+                <section className="rounded-lg border border-[#e7ebf2] bg-[#fbfcfe] p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">Danh mục</p>
+                  <div className="mt-2 max-h-[36vh] overflow-y-auto pr-1">
+                    <ul className="space-y-1.5">
+                      {sidebarCategories.map((category) => {
+                        const isActive = activeMenuKey === `category:${category.slug}`;
+
+                        return (
+                          <li key={`mobile-filter-category-${category.slug}`}>
+                            <Link
+                              href={`/danh-muc/${category.slug}`}
+                              onClick={() => setIsMobileFilterOpen(false)}
+                              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[13px] transition ${
+                                isActive
+                                  ? "bg-[#fbf7e4] font-semibold text-[#be9b22]"
+                                  : "border border-[#e7ebf2] bg-white text-[#495264] hover:bg-[#f8f9fb]"
+                              }`}
+                            >
+                              <span>▸</span>
+                              <span>{category.name}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </section>
+
+                <section className="mt-3 rounded-lg border border-[#e7ebf2] bg-[#fbfcfe] p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a7f1a]">Giá sản phẩm</p>
+                  <ul className="mt-2 space-y-1.5">
+                    {PRICE_FILTERS.map((range) => {
+                      const checked = selectedPriceRanges.includes(range.id);
+
+                      return (
+                        <li key={`mobile-filter-price-${range.id}`}>
+                          <label className="flex cursor-pointer items-center gap-2 rounded-md border border-[#e7ebf2] bg-white px-2 py-2 text-[13px] text-[#4d5667]">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => togglePriceRange(range.id)}
+                              className="h-4 w-4 rounded border-[#cdd4df] text-[#b9961f] focus:ring-[#d9be57]"
+                            />
+                            <span>{range.label}</span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+
+                  {selectedPriceRanges.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPriceRanges([])}
+                      className="mt-3 w-full rounded-md border border-[#e0c96f] bg-[#fbf4da] px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#8c6d10]"
+                    >
+                      Xóa lọc giá
+                    </button>
+                  ) : null}
+                </section>
+              </div>
+
+              <div className="border-t border-[#e6eaf1] p-4">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="w-full rounded-lg bg-[#c9a22f] px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#1f232c] transition hover:brightness-95"
+                >
+                  Xem sản phẩm
+                </button>
+              </div>
+            </aside>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

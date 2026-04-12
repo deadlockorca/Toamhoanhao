@@ -608,7 +608,7 @@ export default function SiteHeader() {
       </div>
 
       <div
-        className={`fixed inset-0 z-[90] md:hidden transition-[visibility] duration-300 ${
+        className={`fixed inset-0 z-[110] md:hidden transition-[visibility] duration-300 ${
           isMobileMenuOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
         }`}
         role={isMobileMenuOpen ? "dialog" : undefined}
@@ -642,7 +642,7 @@ export default function SiteHeader() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 py-3">
+            <div className="flex-1 overflow-y-auto px-4 py-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
               <nav className="grid gap-2">
                 {mobileMenuLinks.map((item) => (
                   <Link
