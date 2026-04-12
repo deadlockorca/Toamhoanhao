@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+
+import { addItemToLocalCart } from "@/lib/cart";
 
 type ProductVariantItem = {
   id: string;
@@ -80,12 +83,16 @@ const getVariantLabel = (variant: ProductVariantItem) => {
 };
 
 export default function ProductDetailView({ product, relatedProducts, sitePhone }: ProductDetailViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<DetailTabId>("description");
   const [selectedVariantId, setSelectedVariantId] = useState<string>(
     product.variants.find((variant) => variant.isDefault)?.id ?? product.variants[0]?.id ?? "",
   );
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.imageUrls[0] ?? "/products/p1.jpg");
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
+  const [addToCartState, setAddToCartState] = useState<"idle" | "success" | "error">("idle");
 
   const selectedVariant = useMemo(
     () => product.variants.find((variant) => variant.id === selectedVariantId) ?? null,
@@ -110,6 +117,69 @@ export default function ProductDetailView({ product, relatedProducts, sitePhone 
   const displayOriginalPrice = selectedVariant?.originalPrice ?? product.originalPrice;
   const displayContactPrice = isContactPrice(displayPrice, displayOriginalPrice);
   const inStock = selectedVariant?.inStock ?? product.inStock;
+  const selectedVariantLabel = selectedVariant ? getVariantLabel(selectedVariant) : null;
+
+  useEffect(() => {
+    if (addToCartState === "idle") {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setAddToCartState("idle");
+    }, 2200);
+
+    return () => window.clearTimeout(timer);
+  }, [addToCartState]);
+
+  const upsertSelectedProductToCart = () => {
+    const cartKey = `${product.id}::${selectedVariant?.id ?? "default"}`;
+
+    addItemToLocalCart({
+      key: cartKey,
+      productId: product.id,
+      variantId: selectedVariant?.id ?? null,
+      slug: product.slug,
+      name: product.name,
+      image: selectedVariant?.imageUrl?.trim() || currentImage,
+      price: displayPrice,
+      originalPrice: displayOriginalPrice,
+      quantity,
+      variantLabel: selectedVariantLabel,
+    });
+  };
+
+  const handleAddToCart = () => {
+    if (!inStock || isAddingToCart) {
+      return;
+    }
+
+    setIsAddingToCart(true);
+
+    try {
+      upsertSelectedProductToCart();
+      setAddToCartState("success");
+    } catch {
+      setAddToCartState("error");
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (!inStock || isBuyingNow) {
+      return;
+    }
+
+    setIsBuyingNow(true);
+
+    try {
+      upsertSelectedProductToCart();
+      router.push("/thanh-toan");
+    } catch {
+      setAddToCartState("error");
+      setIsBuyingNow(false);
+    }
+  };
 
   return (
     <>
@@ -275,9 +345,19 @@ export default function ProductDetailView({ product, relatedProducts, sitePhone 
 
                 <button
                   type="button"
-                  className="h-10 rounded-full bg-[#1f242c] px-5 text-[13px] font-semibold uppercase tracking-[0.03em] text-white transition hover:bg-[#333a45]"
+                  onClick={handleBuyNow}
+                  disabled={!inStock || isBuyingNow}
+                  className="h-10 rounded-full bg-[#1f242c] px-5 text-[13px] font-semibold uppercase tracking-[0.03em] text-white transition hover:bg-[#333a45] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Mua ngay
+                  {isBuyingNow ? "Đang xử lý..." : "Mua ngay"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={!inStock || isAddingToCart}
+                  className="h-10 rounded-full border border-[#d2b357] bg-white px-5 text-[13px] font-semibold uppercase tracking-[0.03em] text-[#6d5710] transition hover:bg-[#fff9e8] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isAddingToCart ? "Đang thêm..." : "Thêm vào giỏ hàng"}
                 </button>
                 <a
                   href={`tel:${sitePhone}`}
@@ -286,6 +366,13 @@ export default function ProductDetailView({ product, relatedProducts, sitePhone 
                   Liên hệ tư vấn
                 </a>
               </div>
+
+              {addToCartState === "success" ? (
+                <p className="text-[13px] font-medium text-[#1f7a43]">Đã thêm sản phẩm vào giỏ hàng.</p>
+              ) : null}
+              {addToCartState === "error" ? (
+                <p className="text-[13px] font-medium text-[#b42318]">Không thể thêm vào giỏ hàng. Vui lòng thử lại.</p>
+              ) : null}
 
               <div className="grid gap-2 rounded-2xl border border-[#e4e7ed] bg-[#fafbfc] p-3 text-[13px] text-[#4b5565]">
                 <p>• Miễn phí tư vấn thiết kế theo không gian thực tế.</p>

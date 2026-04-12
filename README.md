@@ -196,6 +196,24 @@ Tuỳ chọn hay dùng:
   - `POST /api/auth/login`
   - `POST /api/auth/logout`
   - `GET /api/auth/me`
+  - `GET /api/auth/google/start`
+  - `GET /api/auth/google/callback`
+
+### Đăng nhập Google OAuth
+
+Thêm biến môi trường:
+
+```env
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# Optional: nếu bỏ trống sẽ tự dùng <origin>/api/auth/google/callback
+GOOGLE_REDIRECT_URI="https://your-domain.com/api/auth/google/callback"
+```
+
+Trong Google Cloud Console, thêm redirect URI trùng với endpoint callback của bạn:
+- `https://your-domain.com/api/auth/google/callback`
+- `http://localhost:3000/api/auth/google/callback` (khi chạy local)
 
 ### Cập nhật database cho auth
 

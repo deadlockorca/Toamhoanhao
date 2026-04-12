@@ -191,6 +191,11 @@ export default function SiteFooter({
                 </Link>
               </li>
               <li>
+                <Link href="/tra-cuu-don-hang" className="inline-flex transition hover:text-[#947717]">
+                  Tra cứu đơn hàng
+                </Link>
+              </li>
+              <li>
                 <Link href="/huong-dan-giao-hang-lap-dat" className="inline-flex transition hover:text-[#947717]">
                   Giao hàng & Lắp đặt
                 </Link>

@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
+import { AUTH_UPDATED_EVENT } from "@/lib/auth-client";
+import { CART_UPDATED_EVENT, getLocalCartCount } from "@/lib/cart";
+
 function GlobeIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
@@ -393,12 +396,44 @@ type HeaderCollectionLink = {
   slug: string;
 };
 
+type HeaderAuthUser = {
+  id: string;
+  email: string;
+  fullName: string | null;
+};
+
+type HeaderAuthMeResponse = {
+  authenticated: boolean;
+  user?: HeaderAuthUser;
+};
+
+const getHeaderDisplayName = (user: HeaderAuthUser | null) => {
+  if (!user) {
+    return "";
+  }
+
+  const fullName = user.fullName?.trim();
+  if (fullName) {
+    return fullName;
+  }
+
+  const email = user.email?.trim();
+  if (!email) {
+    return "Tài khoản";
+  }
+
+  const localPart = email.split("@")[0]?.trim();
+  return localPart || email;
+};
+
 export default function SiteHeader() {
   const [collectionLinks, setCollectionLinks] = useState<HeaderCollectionLink[]>([]);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
   const [siteBrandName, setSiteBrandName] = useState("Tổ Ấm Hoàn Hảo");
   const [siteBrandTagline, setSiteBrandTagline] = useState("Nội thất xuất khẩu");
   const [sitePhone, setSitePhone] = useState("0901.827.555");
+  const [currentUser, setCurrentUser] = useState<HeaderAuthUser | null>(null);
+  const [cartCount, setCartCount] = useState(() => (typeof window === "undefined" ? 0 : getLocalCartCount()));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileExpandedKeys, setMobileExpandedKeys] = useState<Record<string, boolean>>({});
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -539,6 +574,65 @@ export default function SiteHeader() {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    const syncCartCount = () => {
+      setCartCount(getLocalCartCount());
+    };
+
+    syncCartCount();
+    window.addEventListener("storage", syncCartCount);
+    window.addEventListener(CART_UPDATED_EVENT, syncCartCount as EventListener);
+
+    return () => {
+      window.removeEventListener("storage", syncCartCount);
+      window.removeEventListener(CART_UPDATED_EVENT, syncCartCount as EventListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const syncAuthState = async () => {
+      try {
+        const response = await fetch("/api/auth/me", {
+          method: "GET",
+          cache: "no-store",
+        });
+
+        const payload = (await response.json()) as HeaderAuthMeResponse;
+        if (ignore) {
+          return;
+        }
+
+        if (!response.ok || !payload.authenticated || !payload.user) {
+          setCurrentUser(null);
+          return;
+        }
+
+        setCurrentUser(payload.user);
+      } catch {
+        if (!ignore) {
+          setCurrentUser(null);
+        }
+      }
+    };
+
+    const handleAuthUpdated = () => {
+      void syncAuthState();
+    };
+
+    void syncAuthState();
+    window.addEventListener(AUTH_UPDATED_EVENT, handleAuthUpdated);
+
+    return () => {
+      ignore = true;
+      window.removeEventListener(AUTH_UPDATED_EVENT, handleAuthUpdated);
+    };
+  }, []);
+
+  const accountTitle = currentUser ? getHeaderDisplayName(currentUser) : "Đăng nhập";
+  const accountSubtitle = currentUser ? "Tài khoản" : "Đăng ký";
+
   const toggleMobileCategory = (key: string) => {
     setMobileExpandedKeys((prev) => ({
       ...prev,
@@ -589,7 +683,12 @@ export default function SiteHeader() {
             <MobileRoundIcon icon={<PersonIcon />} href="/tai-khoan" ariaLabel="Tài khoản" />
             <MobileRoundIcon icon={<StoreIcon />} href="/he-thong-cua-hang" ariaLabel="Hệ thống cửa hàng" />
             <MobileRoundIcon icon={<PhoneIcon />} href="/lien-he" ariaLabel="Hỗ trợ khách hàng" />
-            <MobileRoundIcon icon={<CartIcon />} ariaLabel="Giỏ hàng" badge="0" />
+            <MobileRoundIcon
+              icon={<CartIcon />}
+              href="/gio-hang"
+              ariaLabel="Giỏ hàng"
+              badge={cartCount > 0 ? String(Math.min(cartCount, 99)) : undefined}
+            />
           </div>
         </div>
 
@@ -746,7 +845,7 @@ export default function SiteHeader() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 text-[15px] lg:justify-end">
-          <ActionItem icon={<PersonIcon />} title="Đăng nhập" subtitle="Đăng ký" href="/tai-khoan" />
+          <ActionItem icon={<PersonIcon />} title={accountTitle} subtitle={accountSubtitle} href="/tai-khoan" />
           <ActionItem icon={<StoreIcon />} title="Hệ thống" subtitle="cửa hàng" href="/he-thong-cua-hang" />
           <ActionItem
             icon={<PhoneIcon />}
@@ -755,16 +854,18 @@ export default function SiteHeader() {
             href="/lien-he"
           />
 
-          <button
-            type="button"
+          <Link
+            href="/gio-hang"
             className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#d8dde6] bg-white text-[#222a36] shadow-[0_2px_8px_rgba(15,23,42,0.1)] transition hover:scale-105 hover:border-[#c7cfdb] hover:shadow-[0_5px_14px_rgba(15,23,42,0.16)]"
             aria-label="Giỏ hàng"
           >
             <CartIcon />
-            <span className="absolute -right-1.5 -top-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#ecea3b] text-[11px] font-semibold text-[#1e1e1e]">
-              0
-            </span>
-          </button>
+            {cartCount > 0 ? (
+              <span className="absolute -right-1.5 -top-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#ecea3b] text-[11px] font-semibold text-[#1e1e1e]">
+                {Math.min(cartCount, 99)}
+              </span>
+            ) : null}
+          </Link>
         </div>
       </div>
 
