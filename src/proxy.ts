@@ -13,11 +13,22 @@ const UNAUTHORIZED_HEADERS = {
   "WWW-Authenticate": 'Basic realm="Admin Area"',
 };
 
+const REAUTH_COOKIE_NAME = "__toam_admin_reauth";
+
 const unauthorizedResponse = () =>
   new NextResponse("Unauthorized", {
     status: 401,
     headers: UNAUTHORIZED_HEADERS,
   });
+
+const isSecureRequest = (request: NextRequest) => {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0]?.trim() === "https";
+  }
+
+  return request.nextUrl.protocol === "https:";
+};
 
 export async function proxy(request: NextRequest) {
   const credentialConfig = getAdminCredential();
@@ -25,6 +36,25 @@ export async function proxy(request: NextRequest) {
     return new NextResponse(credentialConfig.error, {
       status: 500,
     });
+  }
+
+  const pathname = request.nextUrl.pathname;
+  const isSwitchAccountPath = pathname === "/admin/switch-account" || pathname === "/admin/switch-account/";
+  const shouldForceChallenge =
+    isSwitchAccountPath && request.cookies.get(REAUTH_COOKIE_NAME)?.value !== "1";
+
+  if (shouldForceChallenge) {
+    const response = unauthorizedResponse();
+    response.cookies.set({
+      name: REAUTH_COOKIE_NAME,
+      value: "1",
+      path: "/admin",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: isSecureRequest(request),
+      maxAge: 120,
+    });
+    return response;
   }
 
   const authorizationHeader = request.headers.get("authorization");
@@ -76,11 +106,28 @@ export async function proxy(request: NextRequest) {
     };
   }
 
-  const pathname = request.nextUrl.pathname;
   if (!canAccessAdminPath(identity.role, pathname)) {
+    if (pathname.startsWith("/admin")) {
+      const redirectUrl = new URL(getDefaultAdminPathByRole(identity.role), request.url);
+      return NextResponse.redirect(redirectUrl);
+    }
+
     return new NextResponse("Forbidden", {
       status: 403,
     });
+  }
+
+  if (isSwitchAccountPath) {
+    const targetPath = getDefaultAdminPathByRole(identity.role);
+    const redirectUrl = new URL(targetPath, request.url);
+    const response = NextResponse.redirect(redirectUrl);
+    response.cookies.set({
+      name: REAUTH_COOKIE_NAME,
+      value: "",
+      path: "/admin",
+      maxAge: 0,
+    });
+    return response;
   }
 
   if (pathname === "/admin" || pathname === "/admin/") {

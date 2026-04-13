@@ -169,7 +169,7 @@ export const canAccessAdminPath = (role: AdminRole, pathname: string) => {
     return true;
   }
 
-  if (normalizedPathname === "/admin") {
+  if (normalizedPathname === "/admin" || normalizedPathname === "/admin/switch-account") {
     return true;
   }
 

@@ -97,6 +97,12 @@ export default function AdminSectionNav() {
             </Link>
           );
         })}
+        <a
+          href="/admin/switch-account"
+          className="rounded-lg border border-[#e0b94f] bg-[#fff7de] px-3 py-1.5 text-[13px] font-medium text-[#7a5a00] transition hover:bg-[#ffefc0]"
+        >
+          Đổi tài khoản
+        </a>
       </nav>
       {roleLabel ? <p className="text-[12px] text-[#6a7280]">Vai trò hiện tại: {roleLabel}</p> : null}
     </div>

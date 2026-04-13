@@ -139,6 +139,8 @@ Khi đăng nhập vào `/admin`:
 - `MEDIA` được chuyển vào `/admin/banners`
 - `ORDER_STAFF` được chuyển vào `/admin/orders`
 
+Nếu trình duyệt đang nhớ tài khoản cũ, bấm nút `Đổi tài khoản` trong thanh admin (hoặc truy cập `/admin/switch-account`) để nhập lại tài khoản khác.
+
 ## Upload ảnh bằng Cloudflare R2
 
 Trang admin đã có nút upload ảnh trực tiếp lên R2 tại:
