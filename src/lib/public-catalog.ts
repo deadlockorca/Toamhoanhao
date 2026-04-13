@@ -70,6 +70,9 @@ const publicProductWhere = {
   status: ProductStatus.ACTIVE,
 };
 
+const normalizePublicSearchQuery = (value: string) =>
+  value.trim().replace(/\s+/g, " ").slice(0, 120);
+
 export const getNewProducts = async (take = 36) => {
   const products = await prisma.product.findMany({
     where: {
@@ -350,6 +353,54 @@ export const getProductsByCategorySlug = async (slug: string, take = 96) => {
     category,
     products: products.map((product) => toPublicProductCard(product)),
   };
+};
+
+export const searchPublicProducts = async (query: string, take = 120) => {
+  const normalizedQuery = normalizePublicSearchQuery(query);
+  if (!normalizedQuery) {
+    return [] as PublicProductCard[];
+  }
+
+  const tokens = normalizedQuery
+    .split(" ")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (tokens.length === 0) {
+    return [] as PublicProductCard[];
+  }
+
+  const products = await prisma.product.findMany({
+    where: {
+      ...publicProductWhere,
+      AND: tokens.map((token) => ({
+        OR: [
+          { name: { contains: token } },
+          { slug: { contains: token } },
+          { badge: { contains: token } },
+          {
+            category: {
+              is: {
+                name: { contains: token },
+              },
+            },
+          },
+          {
+            category: {
+              is: {
+                slug: { contains: token },
+              },
+            },
+          },
+        ],
+      })),
+    },
+    orderBy: [{ totalSold: "desc" }, { createdAt: "desc" }],
+    take,
+    select: publicProductSelect,
+  });
+
+  return products.map((product) => toPublicProductCard(product));
 };
 
 export const getHeaderCollectionLinks = async (take = 8): Promise<HeaderCollectionLink[]> => {

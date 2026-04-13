@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type FormEvent, ReactNode, useEffect, useRef, useState } from "react";
 
 import { AUTH_UPDATED_EVENT } from "@/lib/auth-client";
 import { CART_UPDATED_EVENT, getLocalCartCount } from "@/lib/cart";
@@ -426,7 +427,24 @@ const getHeaderDisplayName = (user: HeaderAuthUser | null) => {
   return localPart || email;
 };
 
+const SEARCH_PAGE_PATH = "/tim-kiem";
+
+const normalizeSearchKeyword = (value: string) =>
+  value.trim().replace(/\s+/g, " ").slice(0, 120);
+
+const toSearchPageHref = (keyword: string) => {
+  const normalizedKeyword = normalizeSearchKeyword(keyword);
+  if (!normalizedKeyword) {
+    return SEARCH_PAGE_PATH;
+  }
+
+  const params = new URLSearchParams();
+  params.set("q", normalizedKeyword);
+  return `${SEARCH_PAGE_PATH}?${params.toString()}`;
+};
+
 export default function SiteHeader() {
+  const router = useRouter();
   const [collectionLinks, setCollectionLinks] = useState<HeaderCollectionLink[]>([]);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
   const [siteBrandName, setSiteBrandName] = useState("Tổ Ấm Hoàn Hảo");
@@ -480,6 +498,18 @@ export default function SiteHeader() {
     }
     setMobileExpandedKeys({});
     setIsMobileMenuOpen(true);
+  };
+
+  const navigateToSearchPage = (value: string) => {
+    const nextHref = toSearchPageHref(value);
+    router.push(nextHref);
+  };
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const keyword = formData.get("q");
+    navigateToSearchPage(typeof keyword === "string" ? keyword : "");
   };
 
   useEffect(
@@ -693,16 +723,20 @@ export default function SiteHeader() {
         </div>
 
         <div className="px-4 pb-3">
-          <div className="flex items-center border border-[#d2d5db] bg-white px-4 py-2.5">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex items-center border border-[#d2d5db] bg-white px-4 py-2.5"
+          >
             <input
+              name="q"
               type="text"
               placeholder="Tìm kiếm sản phẩm..."
               className="w-full bg-transparent text-[14px] text-[#111] placeholder:text-[#6f747d] focus:outline-none"
             />
-            <button type="button" aria-label="Tìm kiếm" className="text-[#d6b62f]">
+            <button type="submit" aria-label="Tìm kiếm" className="text-[#d6b62f]">
               <SearchIcon />
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -828,20 +862,24 @@ export default function SiteHeader() {
         </Link>
 
         <div>
-          <div className="flex items-center rounded-full border border-[#d7dbe4] bg-white px-4 py-2.5 shadow-[0_2px_10px_rgba(15,23,42,0.08)]">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex items-center rounded-full border border-[#d7dbe4] bg-white px-4 py-2.5 shadow-[0_2px_10px_rgba(15,23,42,0.08)]"
+          >
             <input
+              name="q"
               type="text"
               placeholder="Tìm kiếm sản phẩm..."
               className="w-full bg-transparent text-[15px] text-[#111] placeholder:text-[#b5b5b5] focus:outline-none md:text-[16px]"
             />
             <button
-              type="button"
+              type="submit"
               aria-label="Tìm kiếm"
               className="shrink-0 rounded-full p-1 text-[#161616] transition hover:bg-[#f2f2f2]"
             >
               <SearchIcon />
             </button>
-          </div>
+          </form>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 text-[15px] lg:justify-end">
