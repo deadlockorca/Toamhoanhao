@@ -18,9 +18,17 @@ npm run build
 npm run start
 ```
 
-`npm run start` dùng `server.js` wrapper để:
-- tắt core dump trên Linux host (`ulimit/prlimit`)
-- tự dọn file `core.*` định kỳ (mặc định mỗi 60 giây)
+`npm run start` đang chạy `next start -p 3000`.
+
+## Deploy VPS (1 lệnh full)
+
+Lệnh dưới sẽ cập nhật code mới nhất từ `origin/main`, cài dependencies, generate Prisma client, chạy migrate nếu có thư mục migration, build và restart PM2:
+
+```bash
+cd /www/wwwroot/toamhoanhao.net && git fetch origin main && git reset --hard origin/main && npm ci && npx prisma generate && (test -d prisma/migrations && [ -n "$(ls -A prisma/migrations 2>/dev/null)" ] && npx prisma migrate deploy || echo "Skip migrate deploy: no migrations") && NODE_OPTIONS="--max-old-space-size=1024" npm run build && (pm2 describe toamhoanhao >/dev/null 2>&1 && pm2 restart toamhoanhao --update-env || pm2 start npm --name toamhoanhao --cwd /www/wwwroot/toamhoanhao.net -- start) && pm2 save && pm2 status && ss -tulpn | grep :3000 && curl -I http://127.0.0.1:3000
+```
+
+Lưu ý: `git reset --hard origin/main` sẽ xóa các thay đổi local chưa commit trên VPS.
 
 ## 2) Cấu hình MySQL trên cPanel
 
