@@ -96,16 +96,16 @@ export default function SiteFooter({
   return (
     <footer className="border-t border-[#e2e2e5] bg-[#f1f2f4]">
       <section className="border-b border-[#d9dbe1] bg-[#ececef]">
-        <div className="mx-auto w-full max-w-[1320px] px-4 py-10 md:px-6 md:py-14">
+        <div className="mx-auto w-full max-w-[1320px] px-4 py-10 md:px-6 md:py-10">
           <div className="mx-auto max-w-[900px] text-center text-[#374151]">
-            <p className="text-[22px] font-medium tracking-[0.01em] md:text-[42px]">HÃY GHÉ THĂM</p>
-            <h2 className="mt-2 text-[40px] font-bold uppercase leading-[1.08] tracking-[0.02em] md:text-[64px]">
+            <p className="text-[22px] font-medium tracking-[0.01em] md:text-[30px]">HÃY GHÉ THĂM</p>
+            <h2 className="mt-2 text-[40px] font-bold uppercase leading-[1.08] tracking-[0.02em] md:text-[46px]">
               CỬA HÀNG TỔ ẤM
             </h2>
-            <p className="mt-4 text-[22px] font-semibold md:text-[44px]">Tại Hà Nội và Hồ Chí Minh</p>
+            <p className="mt-3 text-[22px] font-semibold md:text-[30px]">Tại Hà Nội và Hồ Chí Minh</p>
             <Link
               href="/he-thong-cua-hang"
-              className="group relative mt-6 inline-flex h-14 items-center justify-center overflow-hidden rounded-[14px] border border-[#d2b03d] bg-gradient-to-b from-[#f8e26f] via-[#f0d75a] to-[#e4bd33] px-8 text-[18px] font-extrabold uppercase tracking-[0.06em] text-[#151515] shadow-[0_8px_22px_rgba(179,142,28,0.35),inset_0_1px_0_rgba(255,255,255,0.55)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(179,142,28,0.45),inset_0_1px_0_rgba(255,255,255,0.6)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b9901c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ececef] active:translate-y-0 active:shadow-[0_6px_16px_rgba(179,142,28,0.3),inset_0_1px_0_rgba(255,255,255,0.5)] md:mt-8 md:h-[84px] md:min-w-[520px] md:text-[30px]"
+              className="group relative mt-5 inline-flex h-14 items-center justify-center overflow-hidden rounded-[14px] border border-[#d2b03d] bg-gradient-to-b from-[#f8e26f] via-[#f0d75a] to-[#e4bd33] px-8 text-[18px] font-extrabold uppercase tracking-[0.06em] text-[#151515] shadow-[0_8px_22px_rgba(179,142,28,0.35),inset_0_1px_0_rgba(255,255,255,0.55)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(179,142,28,0.45),inset_0_1px_0_rgba(255,255,255,0.6)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b9901c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ececef] active:translate-y-0 active:shadow-[0_6px_16px_rgba(179,142,28,0.3),inset_0_1px_0_rgba(255,255,255,0.5)] md:mt-6 md:h-[64px] md:min-w-[390px] md:px-10 md:text-[22px]"
             >
               <span
                 aria-hidden="true"
@@ -114,8 +114,8 @@ export default function SiteFooter({
               <span className="relative z-10">Tìm ngay Tổ Ấm gần nhất</span>
             </Link>
           </div>
-          <div className="mx-auto mt-10 max-w-[900px] border-t border-[#d3d6dd] pt-8 text-center md:mt-12 md:pt-10">
-            <p className="text-[20px] text-[#3d4453] md:text-[48px]">HOẶC GỌI CHO CHÚNG TÔI (8h30 - 20h30)</p>
+          <div className="mx-auto mt-8 max-w-[900px] border-t border-[#d3d6dd] pt-7 text-center md:mt-10 md:pt-8">
+            <p className="text-[20px] text-[#3d4453] md:text-[30px]">HOẶC GỌI CHO CHÚNG TÔI (8h30 - 20h30)</p>
             <a
               href={toTelHref(primaryPhone)}
               className="mt-5 inline-flex items-center justify-center gap-4 text-[#0f172a] transition hover:opacity-90 md:mt-6 md:gap-6"
@@ -123,7 +123,7 @@ export default function SiteFooter({
               <span className="text-[#6b7280]">
                 <HeadsetIcon />
               </span>
-              <span className="text-[36px] font-bold tracking-[0.02em] md:text-[76px]">{primaryPhone}</span>
+              <span className="text-[36px] font-bold tracking-[0.02em] md:text-[54px]">{primaryPhone}</span>
             </a>
           </div>
         </div>
