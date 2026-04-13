@@ -58,12 +58,13 @@ const SIDEBAR_SHORTCUT_LINKS: Array<{ key: string; label: string; href: string }
   { key: "contact", label: "Liên hệ", href: "/lien-he" },
 ];
 
-const formatVnd = (value: number) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-    maximumFractionDigits: 0,
-  }).format(value);
+const VND_FORMATTER = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+  maximumFractionDigits: 0,
+});
+
+const formatVnd = (value: number) => VND_FORMATTER.format(value);
 
 const isContactPrice = (price: number, originalPrice: number | null) =>
   price <= 0 && (originalPrice === null || originalPrice <= 0);

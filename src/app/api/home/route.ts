@@ -20,6 +20,7 @@ const NO_STORE_HEADERS = {
 
 const defaultTake = 8;
 const DEFAULT_SITE_PHONE = "0901.827.555";
+let didEnsureDefaultCategories = false;
 
 type CategoryTreeNode = {
   id: string;
@@ -79,8 +80,13 @@ const normalizeSitePhone = (value: unknown): string => {
 };
 
 const ensureDefaultCategories = async () => {
+  if (didEnsureDefaultCategories) {
+    return;
+  }
+
   const existingCount = await prisma.category.count();
   if (existingCount > 0) {
+    didEnsureDefaultCategories = true;
     return;
   }
 
@@ -91,6 +97,8 @@ const ensureDefaultCategories = async () => {
     })),
     skipDuplicates: true,
   });
+
+  didEnsureDefaultCategories = true;
 };
 
 const toCategoryTree = (
@@ -121,7 +129,7 @@ const toCategoryTree = (
     if (category.parentId) {
       const parentNode = nodeMap.get(category.parentId);
       if (parentNode) {
-        parentNode.children = [...(parentNode.children ?? []), node];
+        parentNode.children?.push(node);
         continue;
       }
     }

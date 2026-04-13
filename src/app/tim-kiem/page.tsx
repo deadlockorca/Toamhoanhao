@@ -1,5 +1,9 @@
 import PublicProductGridPage from "@/components/PublicProductGridPage";
-import { getActiveCategoryBanner, searchPublicProducts } from "@/lib/public-catalog";
+import {
+  countPublicSearchProducts,
+  getActiveCategoryBanner,
+  searchPublicProducts,
+} from "@/lib/public-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -28,22 +32,26 @@ const normalizeQuery = (value: string) => value.trim().replace(/\s+/g, " ").slic
 export default async function SearchPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const query = normalizeQuery(toQueryText(resolvedSearchParams.q));
+  const maxFetchedProducts = 160;
 
-  const [products, categoryBanner] = await Promise.all([
-    query ? searchPublicProducts(query, 160) : Promise.resolve([]),
+  const [products, totalMatchedProducts, categoryBanner] = await Promise.all([
+    query ? searchPublicProducts(query, maxFetchedProducts) : Promise.resolve([]),
+    query ? countPublicSearchProducts(query) : Promise.resolve(0),
     getActiveCategoryBanner(),
   ]);
+
+  const subtitle = query
+    ? totalMatchedProducts > products.length
+      ? `Kết quả cho "${query}" (hiển thị ${products.length}/${totalMatchedProducts} sản phẩm).`
+      : `Kết quả cho "${query}" (${totalMatchedProducts} sản phẩm).`
+    : "Nhập từ khóa vào ô tìm kiếm để bắt đầu.";
 
   return (
     <PublicProductGridPage
       title="Tìm kiếm sản phẩm"
       breadcrumbLabel="Tìm kiếm"
       badgeLabel="Search"
-      subtitle={
-        query
-          ? `Kết quả cho "${query}" (${products.length} sản phẩm).`
-          : "Nhập từ khóa vào ô tìm kiếm để bắt đầu."
-      }
+      subtitle={subtitle}
       topBanner={
         categoryBanner
           ? {

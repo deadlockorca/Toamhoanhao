@@ -524,7 +524,7 @@ export default function SiteHeader() {
 
     const loadHeaderData = async () => {
       try {
-        const response = await fetch(`/api/home?take=8&ts=${Date.now()}`, {
+        const response = await fetch("/api/home?take=8", {
           method: "GET",
           cache: "no-store",
         });
