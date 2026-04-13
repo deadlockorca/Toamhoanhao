@@ -1,6 +1,14 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import {
+  authenticateAdminFromEnv,
+  canAccessAdminPath,
+  getAdminCredential,
+  getDefaultAdminPathByRole,
+  isAdminRole,
+} from "@/lib/admin-auth";
+
 const UNAUTHORIZED_HEADERS = {
   "WWW-Authenticate": 'Basic realm="Admin Area"',
 };
@@ -11,55 +19,85 @@ const unauthorizedResponse = () =>
     headers: UNAUTHORIZED_HEADERS,
   });
 
-const parseBasicAuth = (authorizationHeader: string | null) => {
-  if (!authorizationHeader || !authorizationHeader.startsWith("Basic ")) {
-    return null;
-  }
-
-  const encodedCredentials = authorizationHeader.slice("Basic ".length).trim();
-  if (!encodedCredentials) {
-    return null;
-  }
-
-  try {
-    const decoded = atob(encodedCredentials);
-    const separatorIndex = decoded.indexOf(":");
-    if (separatorIndex < 0) {
-      return null;
-    }
-
-    return {
-      username: decoded.slice(0, separatorIndex),
-      password: decoded.slice(separatorIndex + 1),
-    };
-  } catch {
-    return null;
-  }
-};
-
-export function proxy(request: NextRequest) {
-  const expectedUsername = process.env.ADMIN_USERNAME ?? "admin";
-  const expectedPassword = process.env.ADMIN_PASSWORD;
-
-  if (!expectedPassword) {
-    return new NextResponse("Missing ADMIN_PASSWORD environment variable.", {
+export async function proxy(request: NextRequest) {
+  const credentialConfig = getAdminCredential();
+  if (!credentialConfig.ok) {
+    return new NextResponse(credentialConfig.error, {
       status: 500,
     });
   }
 
-  const credentials = parseBasicAuth(request.headers.get("authorization"));
-  if (!credentials) {
-    return unauthorizedResponse();
+  const authorizationHeader = request.headers.get("authorization");
+  let identity = authenticateAdminFromEnv(authorizationHeader);
+
+  if (!identity) {
+    if (!authorizationHeader) {
+      return unauthorizedResponse();
+    }
+
+    const verificationUrl = new URL("/api/internal/admin-basic-auth", request.url);
+    let verificationResponse: Response;
+
+    try {
+      verificationResponse = await fetch(verificationUrl, {
+        method: "GET",
+        headers: {
+          authorization: authorizationHeader,
+        },
+        cache: "no-store",
+      });
+    } catch {
+      return new NextResponse("Authentication service unavailable.", {
+        status: 503,
+      });
+    }
+
+    if (!verificationResponse.ok) {
+      return unauthorizedResponse();
+    }
+
+    const verificationPayload = (await verificationResponse.json()) as {
+      authenticated?: boolean;
+      role?: string;
+      username?: string;
+    };
+
+    if (
+      !verificationPayload.authenticated ||
+      !isAdminRole(verificationPayload.role) ||
+      typeof verificationPayload.username !== "string"
+    ) {
+      return unauthorizedResponse();
+    }
+
+    identity = {
+      role: verificationPayload.role,
+      username: verificationPayload.username,
+    };
   }
 
-  const isAuthorized =
-    credentials.username === expectedUsername && credentials.password === expectedPassword;
-
-  if (!isAuthorized) {
-    return unauthorizedResponse();
+  const pathname = request.nextUrl.pathname;
+  if (!canAccessAdminPath(identity.role, pathname)) {
+    return new NextResponse("Forbidden", {
+      status: 403,
+    });
   }
 
-  return NextResponse.next();
+  if (pathname === "/admin" || pathname === "/admin/") {
+    const targetPath = getDefaultAdminPathByRole(identity.role);
+    const redirectUrl = new URL(targetPath, request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-admin-role", identity.role);
+  requestHeaders.set("x-admin-username", identity.username);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {

@@ -123,6 +123,22 @@ ADMIN_USERNAME="admin"
 ADMIN_PASSWORD="doi-mat-khau-rat-manh"
 ```
 
+### Phân quyền admin theo vai trò
+
+- `ADMIN`: toàn quyền tất cả khu vực quản trị.
+- `MEDIA`: chỉ quản lý banner + bộ sưu tập.
+- `ORDER_STAFF`: chỉ quản lý đơn hàng.
+
+Tài khoản `MEDIA` và `ORDER_STAFF` được tạo trực tiếp trong trang quản trị:
+- `/admin/staff`
+
+`ADMIN` vẫn đăng nhập bằng biến môi trường `ADMIN_USERNAME`/`ADMIN_PASSWORD`.
+
+Khi đăng nhập vào `/admin`:
+- `ADMIN` được chuyển vào `/admin/products`
+- `MEDIA` được chuyển vào `/admin/banners`
+- `ORDER_STAFF` được chuyển vào `/admin/orders`
+
 ## Upload ảnh bằng Cloudflare R2
 
 Trang admin đã có nút upload ảnh trực tiếp lên R2 tại:

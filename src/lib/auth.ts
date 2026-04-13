@@ -104,6 +104,7 @@ export const getSessionByToken = async (token: string): Promise<SessionWithUser 
           id: true,
           email: true,
           fullName: true,
+          isActive: true,
         },
       },
     },
@@ -114,6 +115,15 @@ export const getSessionByToken = async (token: string): Promise<SessionWithUser 
   }
 
   if (session.expiresAt.getTime() <= Date.now()) {
+    await prisma.userSession.delete({
+      where: {
+        id: session.id,
+      },
+    });
+    return null;
+  }
+
+  if (!session.user.isActive) {
     await prisma.userSession.delete({
       where: {
         id: session.id,

@@ -49,12 +49,29 @@ export async function POST(request: Request) {
         email: true,
         fullName: true,
         passwordHash: true,
+        isActive: true,
       },
     });
 
     if (!user || !verifyPassword(payload.password, user.passwordHash)) {
       return NextResponse.json({ error: "Email hoặc mật khẩu không đúng." }, { status: 401 });
     }
+
+    if (!user.isActive) {
+      return NextResponse.json(
+        { error: "Tài khoản của bạn đang bị tạm khóa. Vui lòng liên hệ quản trị viên." },
+        { status: 403 },
+      );
+    }
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        lastLoginAt: new Date(),
+      },
+    });
 
     const session = await createSession(user.id);
     const secure = shouldUseSecureCookie(request);
