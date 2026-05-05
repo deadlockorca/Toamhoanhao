@@ -543,7 +543,7 @@ export default function Home() {
                   onClick={closePromoPopup}
                   className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222] focus-visible:ring-offset-2"
                 >
-                  <div className="relative aspect-[3/4] w-full bg-[#f4d83f]">
+                  <div className="relative aspect-[4/4] w-full bg-[#f4d83f]">
                     <Image
                       src={promoImage}
                       alt={popupBanner?.alt?.trim() || popupBanner?.title?.trim() || "Ưu đãi nội thất"}
