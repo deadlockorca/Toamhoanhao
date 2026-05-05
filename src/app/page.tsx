@@ -513,42 +513,42 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
       {isPromoPopupOpen ? (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 md:p-6">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-5">
           <button
             type="button"
             aria-label="Đóng popup"
             onClick={closePromoPopup}
-            className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"
+            className="absolute inset-0 bg-black/70 transition-opacity duration-300"
           />
 
           <section
             role="dialog"
             aria-modal="true"
             aria-label={popupBanner?.title?.trim() || "Ưu đãi độc quyền"}
-            className="relative z-[1] w-full max-w-[860px]"
+            className="relative z-[1] w-full max-w-[600px] max-md:max-w-[90vw]"
           >
             <button
               type="button"
               aria-label="Đóng"
               onClick={closePromoPopup}
-              className="absolute right-3 top-3 z-[30] inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#dadada] bg-white/95 text-[24px] leading-none text-[#595959] shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition hover:bg-white"
+              className="absolute right-[10px] top-[10px] z-[30] inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[22px] leading-none text-[#595959] shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all duration-300 hover:bg-white hover:rotate-90"
             >
               ×
             </button>
 
-            <div className="overflow-hidden rounded-[24px] border border-[#e2c850] bg-[#f4d83f] shadow-[0_24px_60px_rgba(0,0,0,0.38)]">
+            <div className="overflow-hidden rounded-[12px] bg-[#f4d83f] shadow-[0_20px_60px_rgba(0,0,0,0.3)]">
               {promoImage ? (
                 <Link
                   href={promoCtaHref}
                   onClick={closePromoPopup}
                   className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#222] focus-visible:ring-offset-2"
                 >
-                  <div className="relative aspect-[16/10] w-full max-h-[80vh] bg-[#f4d83f]">
+                  <div className="relative aspect-[3/4] w-full bg-[#f4d83f]">
                     <Image
                       src={promoImage}
                       alt={popupBanner?.alt?.trim() || popupBanner?.title?.trim() || "Ưu đãi nội thất"}
                       fill
-                      sizes="(max-width: 768px) 92vw, 860px"
+                      sizes="(max-width: 768px) 90vw, 600px"
                       className="object-contain object-center"
                     />
                   </div>
