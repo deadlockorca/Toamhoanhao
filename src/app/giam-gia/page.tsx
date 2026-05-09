@@ -10,6 +10,7 @@ export default async function SaleProductsPage() {
     <PublicProductGridPage
       title="Sản phẩm giảm giá"
       breadcrumbLabel="Giảm giá"
+      pagePath="/giam-gia"
       badgeLabel="Ưu đãi nổi bật"
       activeMenuKey="sale"
       subtitle="Danh sách sản phẩm đang có ưu đãi tốt. Giá hiển thị đã đồng bộ theo dữ liệu quản trị."

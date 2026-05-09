@@ -5,6 +5,7 @@ import ProductDetailView from "@/components/ProductDetailView";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { prisma } from "@/lib/prisma";
+import { createBreadcrumbJsonLd, toAbsoluteUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 const DEFAULT_SITE_PHONE = "0901.827.555";
@@ -91,6 +92,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
       category: {
         select: {
           name: true,
+          slug: true,
         },
       },
       images: {
@@ -209,8 +211,58 @@ export default async function ProductDetailPage({ params }: PageProps) {
     };
   });
 
+  const breadcrumbItems = [
+    { name: "Trang chủ", path: "/" },
+    ...(product.category?.slug
+      ? [
+          {
+            name: product.category.name,
+            path: `/danh-muc/${product.category.slug}`,
+          },
+        ]
+      : []),
+    { name: product.name, path: `/san-pham/${product.slug}` },
+  ];
+
+  const breadcrumbJsonLd = createBreadcrumbJsonLd(breadcrumbItems);
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: imageUrls.map((image) => toAbsoluteUrl(image)),
+    description: product.shortDescription || product.description || product.name,
+    sku: product.id,
+    brand: {
+      "@type": "Brand",
+      name: "Tổ Ấm Hoàn Hảo",
+    },
+    ...(product.price > 0
+      ? {
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "VND",
+            price: String(product.price),
+            availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: toAbsoluteUrl(`/san-pham/${product.slug}`),
+          },
+        }
+      : {}),
+  };
+
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productJsonLd),
+        }}
+      />
       <SiteHeader />
       <ProductDetailView
         product={{

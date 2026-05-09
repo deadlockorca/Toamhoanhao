@@ -31,6 +31,7 @@ export default async function CategoryDetailPage({ params }: PageProps) {
     <PublicProductGridPage
       title={data.category.name}
       breadcrumbLabel={data.category.name}
+      pagePath={`/danh-muc/${slug}`}
       badgeLabel="Danh mục sản phẩm"
       activeMenuKey={`category:${slug}`}
       subtitle={

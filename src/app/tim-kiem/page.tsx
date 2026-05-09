@@ -50,6 +50,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     <PublicProductGridPage
       title="Tìm kiếm sản phẩm"
       breadcrumbLabel="Tìm kiếm"
+      pagePath={query ? `/tim-kiem?q=${encodeURIComponent(query)}` : "/tim-kiem"}
       badgeLabel="Search"
       subtitle={subtitle}
       topBanner={

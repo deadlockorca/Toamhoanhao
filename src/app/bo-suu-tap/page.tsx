@@ -5,14 +5,25 @@ import PublicCollectionGrid from "@/components/PublicCollectionGrid";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { getActiveCategoryBanner, getActiveCollections } from "@/lib/public-catalog";
+import { createBreadcrumbJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export default async function CollectionIndexPage() {
   const [collections, categoryBanner] = await Promise.all([getActiveCollections(48), getActiveCategoryBanner()]);
+  const breadcrumbJsonLd = createBreadcrumbJsonLd([
+    { name: "Trang chủ", path: "/" },
+    { name: "Bộ sưu tập", path: "/bo-suu-tap" },
+  ]);
 
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd),
+        }}
+      />
       <SiteHeader />
 
       <main className="py-8 md:py-10">

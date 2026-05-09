@@ -10,6 +10,7 @@ export default async function NewProductsPage() {
     <PublicProductGridPage
       title="Sản phẩm mới"
       breadcrumbLabel="Sản phẩm mới"
+      pagePath="/san-pham-moi"
       badgeLabel="New arrivals"
       activeMenuKey="new"
       subtitle="Những sản phẩm vừa được cập nhật mới nhất trên hệ thống."

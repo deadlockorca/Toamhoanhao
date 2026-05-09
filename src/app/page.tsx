@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import { toAbsoluteUrl } from "@/lib/seo";
 
 type MobileCategoryIconKind = "table" | "sofa" | "chair" | "cabinet" | "bed" | "decor" | "home" | "outdoor";
 
@@ -217,6 +218,18 @@ const homeProductSections: Array<{
     emptyMessage: "Hiện chưa có dữ liệu sản phẩm bán chạy.",
   },
 ];
+
+const homeWebSiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Tổ Ấm Hoàn Hảo",
+  url: toAbsoluteUrl("/"),
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${toAbsoluteUrl("/tim-kiem")}?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
 
 const formatVnd = (value: number) =>
   new Intl.NumberFormat("vi-VN", {
@@ -521,6 +534,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#f4f4f5] text-[#1a1a1a]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(homeWebSiteJsonLd),
+        }}
+      />
       {isPromoPopupOpen ? (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-5">
           <button

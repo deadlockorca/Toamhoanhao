@@ -28,6 +28,11 @@ export default async function CollectionDetailPage({ params }: PageProps) {
     <PublicProductGridPage
       title={collection.name}
       breadcrumbLabel={collection.name}
+      pagePath={`/bo-suu-tap/${slug}`}
+      breadcrumbParent={{
+        name: "Bộ sưu tập",
+        path: "/bo-suu-tap",
+      }}
       badgeLabel="Collection detail"
       activeMenuKey="collections"
       subtitle={collection.description ?? "Danh sách sản phẩm thuộc bộ sưu tập này."}
