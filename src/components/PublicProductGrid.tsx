@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { type PublicProductCard, type PublicSidebarCategoryLink } from "@/lib/public-catalog";
 
@@ -144,8 +145,10 @@ export default function PublicProductGrid({
   mobilePageSize,
   desktopPageSize,
 }: PublicProductGridProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isMobileViewport, setIsMobileViewport] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("newest");
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [isCategoryListOpen, setIsCategoryListOpen] = useState(true);
@@ -229,7 +232,16 @@ export default function PublicProductGrid({
   const activePageSize = isMobileViewport ? mobilePageSize : desktopPageSize;
   const isPagingEnabled = Boolean(activePageSize);
   const totalPages = isPagingEnabled ? Math.ceil(filteredAndSortedProducts.length / (activePageSize as number)) : 1;
-  const effectivePage = isPagingEnabled ? Math.min(currentPage, totalPages > 0 ? totalPages : 1) : 1;
+  const requestedPage = useMemo(() => {
+    const rawPage = searchParams.get("page");
+    if (!rawPage) {
+      return 1;
+    }
+
+    const parsed = Number.parseInt(rawPage, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  }, [searchParams]);
+  const effectivePage = isPagingEnabled ? Math.min(requestedPage, totalPages > 0 ? totalPages : 1) : 1;
 
   const visibleProducts = useMemo(() => {
     if (!isPagingEnabled) {
@@ -246,17 +258,46 @@ export default function PublicProductGrid({
     ? "mt-6 grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4"
     : "mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4";
 
+  const setPageQuery = useCallback((page: number, mode: "push" | "replace" = "push") => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+
+    if (mode === "replace") {
+      router.replace(nextUrl, { scroll: false });
+      return;
+    }
+
+    router.push(nextUrl, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    if (!isPagingEnabled) {
+      return;
+    }
+
+    if (requestedPage !== effectivePage) {
+      setPageQuery(effectivePage, "replace");
+    }
+  }, [effectivePage, isPagingEnabled, requestedPage, setPageQuery]);
+
   const goToPage = (nextPage: number) => {
     if (nextPage === effectivePage) {
       return;
     }
 
-    setCurrentPage(nextPage);
+    setPageQuery(nextPage, "push");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const togglePriceRange = (rangeId: string) => {
-    setCurrentPage(1);
+    setPageQuery(1, "replace");
     setSelectedPriceRanges((prev) =>
       prev.includes(rangeId) ? prev.filter((item) => item !== rangeId) : [...prev, rangeId],
     );
@@ -267,7 +308,7 @@ export default function PublicProductGrid({
       return;
     }
 
-    setCurrentPage(1);
+    setPageQuery(1, "replace");
     setSortKey(nextSortKey);
   };
 
@@ -609,7 +650,10 @@ export default function PublicProductGrid({
                   {selectedPriceRanges.length > 0 ? (
                     <button
                       type="button"
-                      onClick={() => setSelectedPriceRanges([])}
+                      onClick={() => {
+                        setPageQuery(1, "replace");
+                        setSelectedPriceRanges([]);
+                      }}
                       className="mt-3 w-full rounded-md border border-[#e0c96f] bg-[#fbf4da] px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#8c6d10]"
                     >
                       Xóa lọc giá
