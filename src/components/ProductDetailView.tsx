@@ -74,6 +74,15 @@ const formatVnd = (value: number) =>
 const isContactPrice = (price: number, originalPrice: number | null) =>
   price <= 0 && (originalPrice === null || originalPrice <= 0);
 
+const getDiscountPercent = (price: number, originalPrice: number | null) => {
+  if (!originalPrice || originalPrice <= 0 || price <= 0 || originalPrice <= price) {
+    return null;
+  }
+
+  const percent = Math.round(((originalPrice - price) / originalPrice) * 100);
+  return percent > 0 ? percent : null;
+};
+
 const getVariantLabel = (variant: ProductVariantItem) => {
   const parts = [variant.name, variant.option1, variant.option2, variant.option3]
     .map((part) => part?.trim() ?? "")
@@ -476,6 +485,18 @@ export default function ProductDetailView({ product, relatedProducts, sitePhone 
                         {related.badge}
                       </span>
                     ) : null}
+                    {(() => {
+                      const discountPercent = getDiscountPercent(related.price, related.originalPrice);
+                      if (!discountPercent) {
+                        return null;
+                      }
+
+                      return (
+                        <span className="absolute right-3 top-3 rounded-full bg-[#16a34a] px-2.5 py-1 text-[11px] font-bold text-white">
+                          -{discountPercent}%
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   <div className="space-y-2 p-4">

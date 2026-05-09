@@ -70,6 +70,15 @@ const formatVnd = (value: number) => VND_FORMATTER.format(value);
 const isContactPrice = (price: number, originalPrice: number | null) =>
   price <= 0 && (originalPrice === null || originalPrice <= 0);
 
+const getDiscountPercent = (price: number, originalPrice: number | null) => {
+  if (!originalPrice || originalPrice <= 0 || price <= 0 || originalPrice <= price) {
+    return null;
+  }
+
+  const percent = Math.round(((originalPrice - price) / originalPrice) * 100);
+  return percent > 0 ? percent : null;
+};
+
 const getComparablePrice = (product: PublicProductCard): number | null => {
   if (product.price > 0) {
     return product.price;
@@ -498,6 +507,18 @@ export default function PublicProductGrid({
                         {product.badge}
                       </span>
                     ) : null}
+                    {(() => {
+                      const discountPercent = getDiscountPercent(product.price, product.originalPrice);
+                      if (!discountPercent) {
+                        return null;
+                      }
+
+                      return (
+                        <span className="absolute right-3 top-3 rounded-full bg-[#16a34a] px-2.5 py-1 text-[11px] font-bold text-white">
+                          -{discountPercent}%
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   <div className="space-y-2 p-4 text-center">

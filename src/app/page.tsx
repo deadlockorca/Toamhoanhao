@@ -228,6 +228,15 @@ const formatVnd = (value: number) =>
 const isContactPrice = (price: number, originalPrice?: number) =>
   price <= 0 && (originalPrice == null || originalPrice <= 0);
 
+const getDiscountPercent = (price: number, originalPrice?: number) => {
+  if (!originalPrice || originalPrice <= 0 || price <= 0 || originalPrice <= price) {
+    return null;
+  }
+
+  const percent = Math.round(((originalPrice - price) / originalPrice) * 100);
+  return percent > 0 ? percent : null;
+};
+
 const PROMO_POPUP_STORAGE_KEY = "toamhoanhao:promo-popup-closed-at";
 const PROMO_POPUP_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
@@ -744,6 +753,18 @@ export default function Home() {
                                     {product.badge}
                                   </span>
                                 ) : null}
+                                {(() => {
+                                  const discountPercent = getDiscountPercent(product.price, product.originalPrice);
+                                  if (!discountPercent) {
+                                    return null;
+                                  }
+
+                                  return (
+                                    <span className="absolute right-2 top-2 rounded-md bg-[#16a34a] px-2 py-0.5 text-[11px] font-bold text-white md:right-3 md:top-3 md:rounded-full md:px-2.5 md:py-1">
+                                      -{discountPercent}%
+                                    </span>
+                                  );
+                                })()}
                               </div>
 
                               <div className="space-y-1 p-2.5 pt-3 text-center md:space-y-2 md:p-4">
