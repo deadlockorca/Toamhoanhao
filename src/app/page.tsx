@@ -150,7 +150,7 @@ type PopupBannerItem = {
   ctaHref?: string | null;
 };
 
-type ProductTabId = "new" | "best" | "sale";
+type ProductTabId = "new" | "best" | "sale" | "collection";
 
 type ProductItem = {
   id: string;
@@ -160,15 +160,6 @@ type ProductItem = {
   price: number;
   originalPrice?: number;
   badge?: string;
-};
-
-type CollectionShowcaseItem = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | undefined;
-  imageUrl: string | undefined;
-  itemCount: number;
 };
 
 type MobileCategoryShortcut = {
@@ -217,6 +208,13 @@ const homeProductSections: Array<{
     chip: "Best seller",
     emptyMessage: "Hiện chưa có dữ liệu sản phẩm bán chạy.",
   },
+  {
+    id: "collection",
+    title: "Bộ sưu tập",
+    href: "/bo-suu-tap",
+    chip: "Danh mục",
+    emptyMessage: "Danh mục Bộ sưu tập hiện chưa có sản phẩm hiển thị.",
+  },
 ];
 
 const homeWebSiteJsonLd = {
@@ -256,14 +254,6 @@ const PROMO_POPUP_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 type ProductApiPayload = Partial<Record<ProductTabId, ProductItem[]>>;
 
 type HomeApiPayload = {
-  collections?: Array<{
-    id?: string;
-    name?: string;
-    slug?: string;
-    description?: string | null;
-    imageUrl?: string | null;
-    itemCount?: number;
-  }>;
   categoryTree?: CategoryNode[];
   heroBanners?: BannerItem[];
   popupBanner?: PopupBannerItem | null;
@@ -310,14 +300,14 @@ export default function Home() {
     new: [],
     best: [],
     sale: [],
+    collection: [],
   });
-  const [collectionCards, setCollectionCards] = useState<CollectionShowcaseItem[]>([]);
   const productRailRefs = useRef<Record<ProductTabId, HTMLDivElement | null>>({
     new: null,
     best: null,
     sale: null,
+    collection: null,
   });
-  const collectionRailRef = useRef<HTMLDivElement | null>(null);
   const totalSlides = heroBanners.length;
   const promoImage = popupBanner?.src ?? null;
   const promoTitle = popupBanner?.title?.trim() || "SOFA DA BỘ";
@@ -447,8 +437,8 @@ export default function Home() {
               new: [],
               best: [],
               sale: [],
+              collection: [],
             });
-            setCollectionCards([]);
           }
           return;
         }
@@ -458,39 +448,10 @@ export default function Home() {
           new: Array.isArray(payload.products?.new) ? payload.products.new : [],
           best: Array.isArray(payload.products?.best) ? payload.products.best : [],
           sale: Array.isArray(payload.products?.sale) ? payload.products.sale : [],
+          collection: Array.isArray(payload.products?.collection) ? payload.products.collection : [],
         };
 
         if (!ignore) {
-          const normalizedCollectionCards = Array.isArray(payload.collections)
-            ? payload.collections
-                .map((item) => {
-                  const id = typeof item?.id === "string" ? item.id.trim() : "";
-                  const name = typeof item?.name === "string" ? item.name.trim() : "";
-                  const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
-                  const itemCount = typeof item?.itemCount === "number" ? item.itemCount : 0;
-                  if (!id || !name || !slug) {
-                    return null;
-                  }
-
-                  return {
-                    id,
-                    name,
-                    slug,
-                    description:
-                      typeof item?.description === "string" && item.description.trim()
-                        ? item.description.trim()
-                        : undefined,
-                    imageUrl:
-                      typeof item?.imageUrl === "string" && item.imageUrl.trim()
-                        ? item.imageUrl.trim()
-                        : undefined,
-                    itemCount: itemCount > 0 ? itemCount : 0,
-                  } satisfies CollectionShowcaseItem;
-                })
-                .filter((item): item is CollectionShowcaseItem => item !== null)
-            : [];
-
-          setCollectionCards(normalizedCollectionCards);
           setCategoryTree(Array.isArray(payload.categoryTree) ? payload.categoryTree : []);
           setHeroBanners(Array.isArray(payload.heroBanners) ? payload.heroBanners : []);
           setPopupBanner(payload.popupBanner?.src ? payload.popupBanner : null);
@@ -516,8 +477,8 @@ export default function Home() {
             new: [],
             best: [],
             sale: [],
+            collection: [],
           });
-          setCollectionCards([]);
           setCategoryTree([]);
           setHeroBanners([]);
           setPopupBanner(null);
@@ -822,79 +783,6 @@ export default function Home() {
                 );
               })}
 
-              <article className="rounded-2xl border border-[#e5e6ea] bg-white p-5 md:p-6">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a7f1a]">
-                      Collections
-                    </p>
-                    <h3 className="mt-1 text-[22px] font-semibold text-[#20242a] md:text-[26px]">
-                      Bộ sưu tập
-                    </h3>
-                  </div>
-                  <div className="inline-flex items-center gap-2">
-                    <button
-                      type="button"
-                      aria-label="Cuộn trái mục bộ sưu tập"
-                      onClick={() => scrollRail(collectionRailRef.current, "prev")}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d6dae2] bg-white text-[18px] text-[#303744] transition hover:bg-[#f2f4f7]"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Cuộn phải mục bộ sưu tập"
-                      onClick={() => scrollRail(collectionRailRef.current, "next")}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#d6dae2] bg-white text-[18px] text-[#303744] transition hover:bg-[#f2f4f7]"
-                    >
-                      ›
-                    </button>
-                    <Link
-                      href="/bo-suu-tap"
-                      className="inline-flex rounded-full border border-[#dbdee5] px-4 py-2 text-[13px] font-semibold text-[#2f3745] transition hover:bg-[#f6f7fa]"
-                    >
-                      Xem tất cả
-                    </Link>
-                  </div>
-                </div>
-
-                {collectionCards.length > 0 ? (
-                  <div ref={collectionRailRef} className="mt-5 overflow-x-auto pb-2">
-                    <div className="flex gap-4">
-                      {collectionCards.map((collection) => (
-                        <Link
-                          key={collection.id}
-                          href={`/bo-suu-tap/${collection.slug}`}
-                          className="group w-[calc((100%-1rem)/2)] shrink-0 overflow-hidden rounded-2xl border border-[#e7e8ec] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)] sm:w-[48%] lg:w-[19.2%]"
-                        >
-                          <div className="relative aspect-[16/10] overflow-hidden bg-[#f3f4f6]">
-                            <Image
-                              src={collection.imageUrl ?? "/products/p1.jpg"}
-                              alt={collection.name}
-                              fill
-                              sizes="(max-width: 640px) 48vw, (max-width: 1024px) 48vw, 20vw"
-                              className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                            />
-                          </div>
-                          <div className="space-y-2 p-4">
-                            <h4 className="text-[17px] font-semibold leading-[1.3] text-[#1f2937]">{collection.name}</h4>
-                            {collection.description ? (
-                              <p className="line-clamp-2 text-[13px] leading-[1.5] text-[#566072]">{collection.description}</p>
-                            ) : null}
-                            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[#9a7f1a]">
-                              {collection.itemCount} sản phẩm
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-5 rounded-2xl border border-[#e1e4ea] bg-[#fbfcfd] p-8 text-center text-[14px] text-[#6b7280]">
-                    Hiện chưa có bộ sưu tập nào để hiển thị.
-                  </div>
-                )}
-              </article>
             </div>
           </div>
         </section>

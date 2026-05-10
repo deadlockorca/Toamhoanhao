@@ -4,7 +4,6 @@ export type AdminSection =
   | "products"
   | "variants"
   | "banners"
-  | "collections"
   | "orders"
   | "users"
   | "staff";
@@ -122,11 +121,11 @@ export const getRoleLabel = (role: AdminRole) => {
 
 export const getAllowedAdminSections = (role: AdminRole): AdminSection[] => {
   if (role === "ADMIN") {
-    return ["products", "variants", "banners", "collections", "orders", "users", "staff"];
+    return ["products", "variants", "banners", "orders", "users", "staff"];
   }
 
   if (role === "MEDIA") {
-    return ["banners", "collections"];
+    return ["banners"];
   }
 
   return ["orders"];
@@ -147,9 +146,7 @@ export const getDefaultAdminPathByRole = (role: AdminRole) => {
 const isAllowedForMedia = (pathname: string) => {
   const allowedPrefixes = [
     "/admin/banners",
-    "/admin/collections",
     "/api/admin/banners",
-    "/api/admin/collections",
     "/api/admin/uploads",
     "/api/admin/me",
   ];

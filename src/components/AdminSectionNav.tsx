@@ -10,7 +10,6 @@ const adminLinks = [
   { href: "/admin/products", label: "Sản phẩm", section: "products" as const },
   { href: "/admin/variants", label: "Biến thể", section: "variants" as const },
   { href: "/admin/banners", label: "Banner", section: "banners" as const },
-  { href: "/admin/collections", label: "Bộ sưu tập", section: "collections" as const },
   { href: "/admin/orders", label: "Đơn hàng", section: "orders" as const },
   { href: "/admin/users", label: "Khách hàng", section: "users" as const },
   { href: "/admin/staff", label: "Nhân sự", section: "staff" as const },

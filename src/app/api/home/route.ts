@@ -4,10 +4,10 @@ import { BannerKind } from "@prisma/client";
 import { defaultCategories } from "@/lib/default-categories";
 import { prisma } from "@/lib/prisma";
 import {
-  getActiveCollections,
   getBestProducts,
   getHeaderCollectionLinks,
   getNewProducts,
+  getProductsByCategorySlug,
   getSaleProducts,
 } from "@/lib/public-catalog";
 
@@ -147,7 +147,7 @@ export async function GET(request: Request) {
 
     await ensureDefaultCategories();
 
-    const [banners, categories, collectionLinks, collections, newProducts, bestProducts, saleProducts, settings] =
+    const [banners, categories, collectionLinks, collectionCategoryProducts, newProducts, bestProducts, saleProducts, settings] =
       await Promise.all([
         prisma.banner.findMany({
           where: { isActive: true },
@@ -173,7 +173,7 @@ export async function GET(request: Request) {
           },
         }),
         getHeaderCollectionLinks(8),
-        getActiveCollections(20),
+        getProductsByCategorySlug("bo-suu-tap", take),
         getNewProducts(take),
         getBestProducts(take),
         getSaleProducts(take),
@@ -221,7 +221,6 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         collectionLinks,
-        collections,
         categoryTree,
         heroBanners: heroBannerRows.map((banner) => ({
           src: banner.imageUrl,
@@ -241,6 +240,7 @@ export async function GET(request: Request) {
           new: newProducts,
           best: bestProducts,
           sale: saleProducts,
+          collection: collectionCategoryProducts?.products ?? [],
         },
         site: {
           brand: {
