@@ -791,14 +791,14 @@ export default function Home() {
       <section className="border-y border-[#d9dbe1] bg-[#ececef]">
         <div className="mx-auto w-full max-w-[1320px] px-4 py-10 md:px-6 md:py-10">
           <div className="mx-auto max-w-[900px] text-center text-[#374151]">
-            <p className="text-[18px] font-medium tracking-[0.01em] md:text-[26px]">HÃY GHÉ THĂM</p>
-            <h2 className="mt-2 text-[32px] font-bold uppercase leading-[1.08] tracking-[0.02em] md:text-[40px]">
+            <p className="text-[16px] font-medium tracking-[0.01em] md:text-[22px]">HÃY GHÉ THĂM</p>
+            <h2 className="mt-2 text-[28px] font-bold uppercase leading-[1.08] tracking-[0.02em] md:text-[34px]">
               CỬA HÀNG TỔ ẤM
             </h2>
-            <p className="mt-3 text-[18px] font-semibold md:text-[24px]">Tại Hà Nội và Hồ Chí Minh</p>
+            <p className="mt-3 text-[16px] font-semibold md:text-[20px]">Tại Hà Nội và Hồ Chí Minh</p>
             <Link
               href="/he-thong-cua-hang"
-              className="group relative mt-5 inline-flex h-12 items-center justify-center overflow-hidden rounded-[14px] border border-[#d2b03d] bg-gradient-to-b from-[#f8e26f] via-[#f0d75a] to-[#e4bd33] px-6 text-[15px] font-extrabold uppercase tracking-[0.06em] text-[#151515] shadow-[0_8px_22px_rgba(179,142,28,0.35),inset_0_1px_0_rgba(255,255,255,0.55)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(179,142,28,0.45),inset_0_1px_0_rgba(255,255,255,0.6)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b9901c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ececef] active:translate-y-0 active:shadow-[0_6px_16px_rgba(179,142,28,0.3),inset_0_1px_0_rgba(255,255,255,0.5)] md:mt-6 md:h-[64px] md:min-w-[390px] md:px-10 md:text-[19px]"
+              className="group relative mt-5 inline-flex h-11 items-center justify-center overflow-hidden rounded-[14px] border border-[#d2b03d] bg-gradient-to-b from-[#f8e26f] via-[#f0d75a] to-[#e4bd33] px-6 text-[14px] font-extrabold uppercase tracking-[0.06em] text-[#151515] shadow-[0_8px_22px_rgba(179,142,28,0.35),inset_0_1px_0_rgba(255,255,255,0.55)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(179,142,28,0.45),inset_0_1px_0_rgba(255,255,255,0.6)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b9901c]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#ececef] active:translate-y-0 active:shadow-[0_6px_16px_rgba(179,142,28,0.3),inset_0_1px_0_rgba(255,255,255,0.5)] md:mt-6 md:h-[56px] md:min-w-[340px] md:px-8 md:text-[17px]"
             >
               <span
                 aria-hidden="true"
@@ -808,12 +808,12 @@ export default function Home() {
             </Link>
           </div>
           <div className="mx-auto mt-8 max-w-[900px] border-t border-[#d3d6dd] pt-7 text-center md:mt-10 md:pt-8">
-            <p className="text-[16px] text-[#3d4453] md:text-[24px]">HOẶC GỌI CHO CHÚNG TÔI (8h30 - 20h30)</p>
+            <p className="text-[15px] text-[#3d4453] md:text-[20px]">HOẶC GỌI CHO CHÚNG TÔI (8h30 - 20h30)</p>
             <a
               href={`tel:${sitePhone.replace(/\D/g, "")}`}
-              className="mt-5 inline-flex items-center justify-center gap-4 text-[#0f172a] transition hover:opacity-90 md:mt-6 md:gap-6"
+              className="mt-5 inline-flex items-center justify-center gap-3 text-[#0f172a] transition hover:opacity-90 md:mt-6 md:gap-5"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7 text-[#6b7280] md:h-8 md:w-8">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 text-[#6b7280] md:h-7 md:w-7">
                 <path d="M4 13.2a8 8 0 1 1 16 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 <rect
                   x="2.5"
@@ -843,7 +843,7 @@ export default function Home() {
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="text-[30px] font-bold tracking-[0.02em] md:text-[46px]">{sitePhone}</span>
+              <span className="text-[26px] font-bold tracking-[0.02em] md:text-[38px]">{sitePhone}</span>
             </a>
           </div>
         </div>
