@@ -168,36 +168,6 @@ export default function SiteFooter({
               </button>
             </form>
 
-            <div className="mt-6 flex flex-nowrap items-center gap-2">
-              <a
-                href="#"
-                aria-label="Facebook"
-                className="inline-flex h-7 w-7 items-center justify-center transition hover:opacity-90"
-              >
-                <Image src="/social/facebook.svg" alt="Facebook" width={28} height={28} className="h-7 w-7" />
-              </a>
-              <a
-                href="#"
-                aria-label="Instagram"
-                className="inline-flex h-7 w-7 items-center justify-center transition hover:opacity-90"
-              >
-                <Image src="/social/instagram.svg" alt="Instagram" width={28} height={28} className="h-7 w-7" />
-              </a>
-              <a
-                href="#"
-                aria-label="TikTok"
-                className="inline-flex h-7 w-7 items-center justify-center transition hover:opacity-90"
-              >
-                <Image src="/social/tiktok.svg" alt="TikTok" width={28} height={28} className="h-7 w-7" />
-              </a>
-              <a
-                href="#"
-                aria-label="YouTube"
-                className="inline-flex h-7 w-7 items-center justify-center transition hover:opacity-90"
-              >
-                <Image src="/social/youtube.svg" alt="YouTube" width={28} height={28} className="h-7 w-7" />
-              </a>
-            </div>
           </section>
         </div>
 

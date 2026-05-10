@@ -826,9 +826,6 @@ export default function Home() {
                               <div className="inline-flex h-[62px] items-center bg-[#ead044] pl-3 pr-8 [clip-path:polygon(0_0,84%_0,100%_50%,84%_100%,0_100%)]">
                                 <span className="text-[20px] font-semibold uppercase text-[#1f232a]">Giảm giá</span>
                               </div>
-                              <span className="pr-2 text-[20px] font-medium uppercase tracking-[0.02em] text-[#2b3240]">
-                                GIẢM GIÁ
-                              </span>
                             </header>
 
                             {saleHighlights.length > 0 ? (

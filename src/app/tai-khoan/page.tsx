@@ -615,10 +615,6 @@ export default function AccountPage() {
                   </button>
                 </div>
 
-                {mode === "login" ? (
-                  <p className="mt-4 text-center text-[16px] font-semibold text-[#2e3744]">Quên mật khẩu?</p>
-                ) : null}
-
                 <div className="mt-5 border-t border-[#d9d9d9] pt-5 text-center text-[15px] text-[#2f3745]">
                   {modeLabel.switchPrompt}{" "}
                   <button
