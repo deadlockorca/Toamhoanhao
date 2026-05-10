@@ -25,24 +25,7 @@ function PhoneShortcutIcon() {
 
 function ZaloShortcutIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
-      <path
-        d="M3.5 6.8A2.3 2.3 0 0 1 5.8 4.5h12.4a2.3 2.3 0 0 1 2.3 2.3v7.9a2.3 2.3 0 0 1-2.3 2.3h-4l-4.3 3v-3H5.8a2.3 2.3 0 0 1-2.3-2.3Z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8 9h2.8l-2.8 4H11m2-4v4m3.3-4L14 13h2.7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image src="/social/zalo.svg" alt="Zalo" width={20} height={20} className="h-5 w-5" />
   );
 }
 
@@ -80,7 +63,7 @@ export default function SiteFooter({
               <strong>Hotline:</strong> {primaryPhone}
             </p>
             <p className="text-[15px] leading-tight md:text-[17px]">
-              <strong>Email:</strong> sales@toamhoanhao.vn
+              <strong>Email:</strong> hotro.toamhoanhao@gmail.com
             </p>
             <p className="max-w-[720px] text-[14px] leading-[1.55] text-[#2b3240] md:text-[16px]">
               Tổ Ấm Hoàn Hảo là chuỗi bán lẻ và cung cấp giải pháp đồ Nội thất - Trang trí theo phong cách xuất khẩu.

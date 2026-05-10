@@ -169,6 +169,13 @@ type MobileCategoryShortcut = {
   kind: MobileCategoryIconKind;
 };
 
+type HomeCategoryLink = {
+  id: string;
+  label: string;
+  slug: string;
+  kind: MobileCategoryIconKind;
+};
+
 const mobileCategoryShortcutPreset: MobileCategoryShortcut[] = [
   { id: "cat-ban", label: "Bàn", slug: "ban", kind: "table" },
   { id: "cat-sofa", label: "Sofa", slug: "sofa-ghe-thu-gian", kind: "sofa" },
@@ -179,6 +186,33 @@ const mobileCategoryShortcutPreset: MobileCategoryShortcut[] = [
   { id: "cat-home", label: "Đồ gia dụng", slug: "do-gia-dung", kind: "home" },
   { id: "cat-outdoor", label: "Không gian", slug: "khong-gian-ngoai-troi", kind: "outdoor" },
 ];
+
+const categoryIconBySlug: Record<string, MobileCategoryIconKind> = mobileCategoryShortcutPreset.reduce(
+  (acc, item) => {
+    acc[item.slug] = item.kind;
+    return acc;
+  },
+  {} as Record<string, MobileCategoryIconKind>,
+);
+
+const resolveCategoryIconKind = (slug: string, name: string): MobileCategoryIconKind => {
+  const bySlug = categoryIconBySlug[slug];
+  if (bySlug) {
+    return bySlug;
+  }
+
+  const normalized = `${slug} ${name}`.toLowerCase();
+  if (normalized.includes("sofa")) return "sofa";
+  if (normalized.includes("ghe")) return "chair";
+  if (normalized.includes("tu") || normalized.includes("ke")) return "cabinet";
+  if (normalized.includes("giuong")) return "bed";
+  if (normalized.includes("trang-tri") || normalized.includes("trang tri")) return "decor";
+  if (normalized.includes("gia-dung") || normalized.includes("gia dung")) return "home";
+  if (normalized.includes("ngoai-troi") || normalized.includes("ngoai troi")) return "outdoor";
+  return "table";
+};
+
+const saleCategoryExpandSlugs = ["khong-gian-ngoai-troi", "do-cho-be"] as const;
 
 const homeProductSections: Array<{
   id: ProductTabId;
@@ -279,6 +313,7 @@ export default function Home() {
   const [siteBrandTagline, setSiteBrandTagline] = useState("Nội thất xuất khẩu");
   const [sitePhone, setSitePhone] = useState("0901.827.555");
   const [isPromoPopupOpen, setIsPromoPopupOpen] = useState(false);
+  const [isSaleCategoryExpanded, setIsSaleCategoryExpanded] = useState(false);
   const [isPromoPopupEligible, setIsPromoPopupEligible] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -407,6 +442,25 @@ export default function Home() {
         ...item,
         href: `/danh-muc/${item.slug}`,
       }));
+  }, [categoryTree]);
+
+  const desktopCategoryLinks = useMemo<HomeCategoryLink[]>(() => {
+    return categoryTree
+      .map((category, index) => {
+        const slug = category.slug?.trim() ?? "";
+        const label = category.name?.trim() ?? "";
+        if (!slug || !label) {
+          return null;
+        }
+
+        return {
+          id: `desktop-cat-${index}-${slug}`,
+          slug,
+          label,
+          kind: resolveCategoryIconKind(slug, label),
+        } satisfies HomeCategoryLink;
+      })
+      .filter((item): item is HomeCategoryLink => item !== null);
   }, [categoryTree]);
 
   const scrollRail = (container: HTMLDivElement | null, direction: "prev" | "next") => {
@@ -667,10 +721,26 @@ export default function Home() {
             <div className="mt-7 space-y-7">
               {homeProductSections.map((section) => {
                 const products = databaseProductData[section.id];
+                const isSaleSection = section.id === "sale";
+                const saleHighlights = products.slice(0, 4);
+                const saleCategoryPreviewCount = 7;
+                const saleCategoryBaseLinks = desktopCategoryLinks.slice(0, saleCategoryPreviewCount);
+                const saleCategoryExpandedLinks = desktopCategoryLinks.filter((item) =>
+                  saleCategoryExpandSlugs.includes(item.slug as (typeof saleCategoryExpandSlugs)[number]),
+                );
+                const visibleSaleCategoryLinks = isSaleCategoryExpanded
+                  ? [...saleCategoryBaseLinks, ...saleCategoryExpandedLinks.filter((item) => !saleCategoryBaseLinks.some((base) => base.slug === item.slug))]
+                  : saleCategoryBaseLinks;
+                const canToggleSaleCategories = saleCategoryExpandedLinks.length > 0;
 
                 return (
-                  <article key={section.id} className="rounded-2xl border border-[#e5e6ea] bg-white p-5 md:p-6">
-                    <div className="flex flex-wrap items-end justify-between gap-3">
+                  <article
+                    key={section.id}
+                    className={`rounded-2xl border border-[#e5e6ea] bg-white ${
+                      isSaleSection ? "overflow-hidden p-5 md:p-0" : "p-5 md:p-6"
+                    }`}
+                  >
+                    <div className={`flex flex-wrap items-end justify-between gap-3 ${isSaleSection ? "md:hidden" : ""}`}>
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a7f1a]">
                           {section.chip}
@@ -705,80 +775,195 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {products.length > 0 ? (
-                      <div
-                        ref={(node) => {
-                          productRailRefs.current[section.id] = node;
-                        }}
-                        className="mt-5 overflow-x-auto pb-2"
-                      >
-                        <div className="flex gap-4">
-                          {products.map((product) => (
-                            <Link
-                              key={product.id}
-                              href={`/san-pham/${product.slug}`}
-                              className="group w-[calc((100%-1rem)/2)] shrink-0 overflow-hidden bg-transparent transition hover:-translate-y-0.5 sm:w-[48%] md:rounded-2xl md:border md:border-[#e7e8ec] md:bg-white md:shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)] lg:w-[19.2%]"
-                            >
-                              <div className="relative aspect-[4/3] overflow-hidden bg-white md:aspect-square md:bg-[#f3f4f6]">
-                                <Image
-                                  src={product.image}
-                                  alt={product.name}
-                                  fill
-                                  sizes="(max-width: 640px) 48vw, (max-width: 1024px) 48vw, 20vw"
-                                  className="object-contain p-1 transition duration-300 group-hover:scale-[1.03] md:object-cover md:p-0"
-                                />
+                    {isSaleSection ? (
+                      <div className="hidden md:block">
+                        <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+                          <aside className="overflow-hidden border-r border-[#e2e4e9] bg-white">
+                            <div className="flex items-center gap-1.5 bg-[#ead044] px-2.5 py-2">
+                              <span className="text-[17px] leading-none">🧹</span>
+                              <h3 className="text-[16px] font-semibold uppercase tracking-[0.01em] text-[#1f232a]">
+                                Danh mục sản phẩm
+                              </h3>
+                            </div>
 
-                                {product.badge ? (
-                                  <span className="absolute left-2 top-2 rounded-md bg-[#ff1111] px-2.5 py-0.5 text-[11px] font-semibold text-white md:left-3 md:top-3 md:rounded-full md:px-3 md:py-1 md:text-[11px] md:font-bold md:uppercase md:tracking-[0.03em]">
-                                    {product.badge}
-                                  </span>
-                                ) : null}
-                                {(() => {
-                                  const discountPercent = getDiscountPercent(product.price, product.originalPrice);
-                                  if (!discountPercent) {
-                                    return null;
-                                  }
-
-                                  return (
-                                    <span className="absolute right-2 top-2 rounded-md bg-[#16a34a] px-2 py-0.5 text-[11px] font-bold text-white md:right-3 md:top-3 md:rounded-full md:px-2.5 md:py-1">
-                                      -{discountPercent}%
-                                    </span>
-                                  );
-                                })()}
-                              </div>
-
-                              <div className="space-y-1 p-2.5 pt-3 text-center md:space-y-2 md:p-4">
-                                <h4 className="min-h-[3.1rem] text-[12px] font-extrabold uppercase leading-[1.35] tracking-[0.01em] text-[#212738] md:min-h-[2.75rem] md:text-[15px] md:font-semibold md:normal-case md:tracking-normal md:text-[#1f2937]">
-                                  {product.name}
-                                </h4>
-                                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
-                                  {isContactPrice(product.price, product.originalPrice) ? (
-                                    <span className="whitespace-nowrap text-[12px] font-extrabold leading-none tracking-[-0.01em] text-[#2da23e] md:text-[17px] md:font-bold md:text-[#bf1f15]">
-                                      Liên Hệ
-                                    </span>
-                                  ) : (
-                                    <>
-                                      <span className="whitespace-nowrap text-[12px] font-extrabold leading-none tracking-[-0.01em] text-[#2da23e] md:text-[17px] md:font-bold md:text-[#bf1f15]">
-                                        {formatVnd(product.price)}
-                                      </span>
-                                      {product.originalPrice ? (
-                                        <span className="whitespace-nowrap text-[9px] font-bold leading-none tracking-[-0.01em] text-[#d41818] line-through md:text-[13px] md:font-medium md:text-[#8b8f98]">
-                                          {formatVnd(product.originalPrice)}
+                            {desktopCategoryLinks.length > 0 ? (
+                              <ul>
+                                {visibleSaleCategoryLinks.map((item) => (
+                                  <li key={item.id} className="border-b border-dashed border-[#e1e4ea] last:border-b-0">
+                                    <Link
+                                      href={`/danh-muc/${item.slug}`}
+                                      className="flex items-center justify-between gap-2 px-2.5 py-2.5 text-[#242b36] transition hover:bg-[#f7f8fa]"
+                                    >
+                                      <span className="inline-flex items-center gap-2">
+                                        <span className="scale-[0.92] text-[#566072]">
+                                          <MobileCategoryIcon kind={item.kind} />
                                         </span>
-                                      ) : null}
-                                    </>
-                                  )}
-                                </div>
+                                        <span className="text-[13px] font-medium">{item.label}</span>
+                                      </span>
+                                      <span className="text-[17px] leading-none text-[#3b4351]">›</span>
+                                    </Link>
+                                  </li>
+                                ))}
+                                {canToggleSaleCategories ? (
+                                  <li>
+                                    <button
+                                      type="button"
+                                      onClick={() => setIsSaleCategoryExpanded((prev) => !prev)}
+                                      className="block w-full px-2.5 py-2.5 text-left text-[13px] font-medium text-[#2f3746] transition hover:bg-[#f7f8fa]"
+                                    >
+                                      {isSaleCategoryExpanded ? "Thu gọn" : "Xem thêm ..."}
+                                    </button>
+                                  </li>
+                                ) : null}
+                              </ul>
+                            ) : (
+                              <div className="px-4 py-6 text-[14px] text-[#6b7280]">Hiện chưa có danh mục để hiển thị.</div>
+                            )}
+                          </aside>
+
+                          <div className="overflow-hidden bg-white">
+                            <header className="relative flex items-center justify-between border-t-[4px] border-[#ead044] px-2 pb-3 pt-0.5">
+                              <div className="inline-flex h-[62px] items-center bg-[#ead044] pl-3 pr-8 [clip-path:polygon(0_0,84%_0,100%_50%,84%_100%,0_100%)]">
+                                <span className="text-[20px] font-semibold uppercase text-[#1f232a]">Giảm giá</span>
                               </div>
-                            </Link>
-                          ))}
+                              <span className="pr-2 text-[20px] font-medium uppercase tracking-[0.02em] text-[#2b3240]">
+                                GIẢM GIÁ
+                              </span>
+                            </header>
+
+                            {saleHighlights.length > 0 ? (
+                              <div className="grid grid-cols-4 gap-4 px-2 pb-2">
+                                {saleHighlights.map((product) => {
+                                  const discountPercent = getDiscountPercent(product.price, product.originalPrice);
+                                  return (
+                                    <Link
+                                      key={product.id}
+                                      href={`/san-pham/${product.slug}`}
+                                      className="group block rounded-md px-2 pb-2 pt-1 transition hover:bg-[#f8f9fb]"
+                                    >
+                                      <div className="relative mb-4 aspect-[4/3] overflow-hidden">
+                                        {discountPercent ? (
+                                          <span className="absolute left-1 top-1 z-10 rounded-md bg-[#ff1212] px-3 py-1 text-[14px] font-bold text-white">
+                                            {discountPercent}%
+                                          </span>
+                                        ) : null}
+                                        <Image
+                                          src={product.image}
+                                          alt={product.name}
+                                          fill
+                                          sizes="(max-width: 1200px) 25vw, 300px"
+                                          className="object-contain transition duration-300 group-hover:scale-[1.03]"
+                                        />
+                                      </div>
+
+                                      <h4 className="line-clamp-2 text-center text-[14px] font-bold uppercase text-[#384152]">
+                                        {product.name}
+                                      </h4>
+
+                                      <div className="mt-2 flex items-center justify-center gap-2">
+                                        {isContactPrice(product.price, product.originalPrice) ? (
+                                          <span className="text-[15px] font-bold text-[#2a9f3e]">Liên hệ</span>
+                                        ) : (
+                                          <>
+                                            <span className="text-[15px] font-bold text-[#2a9f3e]">{formatVnd(product.price)}</span>
+                                            {product.originalPrice ? (
+                                              <span className="text-[14px] font-bold text-[#ea1b1b] line-through">
+                                                {formatVnd(product.originalPrice)}
+                                              </span>
+                                            ) : null}
+                                          </>
+                                        )}
+                                      </div>
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="px-4 py-8 text-center text-[14px] text-[#6b7280]">
+                                Hiện chưa có sản phẩm giảm giá.
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ) : (
-                      <div className="mt-5 rounded-2xl border border-[#e1e4ea] bg-[#fbfcfd] p-8 text-center text-[14px] text-[#6b7280]">
-                        {section.emptyMessage}
-                      </div>
-                    )}
+                    ) : null}
+
+                    <div className={isSaleSection ? "md:hidden" : ""}>
+                      {products.length > 0 ? (
+                        <div
+                          ref={(node) => {
+                            productRailRefs.current[section.id] = node;
+                          }}
+                          className="mt-5 overflow-x-auto pb-2"
+                        >
+                          <div className="flex gap-4">
+                            {products.map((product) => (
+                              <Link
+                                key={product.id}
+                                href={`/san-pham/${product.slug}`}
+                                className="group w-[calc((100%-1rem)/2)] shrink-0 overflow-hidden bg-transparent transition hover:-translate-y-0.5 sm:w-[48%] md:rounded-2xl md:border md:border-[#e7e8ec] md:bg-white md:shadow-[0_8px_24px_rgba(15,23,42,0.06)] md:hover:shadow-[0_16px_34px_rgba(15,23,42,0.12)] lg:w-[19.2%]"
+                              >
+                                <div className="relative aspect-[4/3] overflow-hidden bg-white md:aspect-square md:bg-[#f3f4f6]">
+                                  <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    fill
+                                    sizes="(max-width: 640px) 48vw, (max-width: 1024px) 48vw, 20vw"
+                                    className="object-contain p-1 transition duration-300 group-hover:scale-[1.03] md:object-cover md:p-0"
+                                  />
+
+                                  {product.badge ? (
+                                    <span className="absolute left-2 top-2 rounded-md bg-[#ff1111] px-2.5 py-0.5 text-[11px] font-semibold text-white md:left-3 md:top-3 md:rounded-full md:px-3 md:py-1 md:text-[11px] md:font-bold md:uppercase md:tracking-[0.03em]">
+                                      {product.badge}
+                                    </span>
+                                  ) : null}
+                                  {(() => {
+                                    const discountPercent = getDiscountPercent(product.price, product.originalPrice);
+                                    if (!discountPercent) {
+                                      return null;
+                                    }
+
+                                    return (
+                                      <span className="absolute right-2 top-2 rounded-md bg-[#16a34a] px-2 py-0.5 text-[11px] font-bold text-white md:right-3 md:top-3 md:rounded-full md:px-2.5 md:py-1">
+                                        -{discountPercent}%
+                                      </span>
+                                    );
+                                  })()}
+                                </div>
+
+                                <div className="space-y-1 p-2.5 pt-3 text-center md:space-y-2 md:p-4">
+                                  <h4 className="min-h-[3.1rem] text-[12px] font-extrabold uppercase leading-[1.35] tracking-[0.01em] text-[#212738] md:min-h-[2.75rem] md:text-[15px] md:font-semibold md:normal-case md:tracking-normal md:text-[#1f2937]">
+                                    {product.name}
+                                  </h4>
+                                  <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+                                    {isContactPrice(product.price, product.originalPrice) ? (
+                                      <span className="whitespace-nowrap text-[12px] font-extrabold leading-none tracking-[-0.01em] text-[#2da23e] md:text-[17px] md:font-bold md:text-[#bf1f15]">
+                                        Liên Hệ
+                                      </span>
+                                    ) : (
+                                      <>
+                                        <span className="whitespace-nowrap text-[12px] font-extrabold leading-none tracking-[-0.01em] text-[#2da23e] md:text-[17px] md:font-bold md:text-[#bf1f15]">
+                                          {formatVnd(product.price)}
+                                        </span>
+                                        {product.originalPrice ? (
+                                          <span className="whitespace-nowrap text-[9px] font-bold leading-none tracking-[-0.01em] text-[#d41818] line-through md:text-[13px] md:font-medium md:text-[#8b8f98]">
+                                            {formatVnd(product.originalPrice)}
+                                          </span>
+                                        ) : null}
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-5 rounded-2xl border border-[#e1e4ea] bg-[#fbfcfd] p-8 text-center text-[14px] text-[#6b7280]">
+                          {section.emptyMessage}
+                        </div>
+                      )}
+                    </div>
                   </article>
                 );
               })}

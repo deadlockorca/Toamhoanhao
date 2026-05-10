@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 function PhoneShortcutIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
@@ -15,24 +17,7 @@ function PhoneShortcutIcon() {
 
 function ZaloShortcutIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
-      <path
-        d="M3.5 6.8A2.3 2.3 0 0 1 5.8 4.5h12.4a2.3 2.3 0 0 1 2.3 2.3v7.9a2.3 2.3 0 0 1-2.3 2.3h-4l-4.3 3v-3H5.8a2.3 2.3 0 0 1-2.3-2.3Z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8 9h2.8l-2.8 4H11m2-4v4m3.3-4L14 13h2.7"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image src="/social/zalo.svg" alt="Zalo" width={18} height={18} className="h-[18px] w-[18px]" />
   );
 }
 
