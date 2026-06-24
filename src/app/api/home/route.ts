@@ -20,6 +20,28 @@ const NO_STORE_HEADERS = {
 
 const defaultTake = 8;
 const DEFAULT_SITE_PHONE = "0901.827.555";
+const fallbackChoixeHeroBanners = [
+  {
+    src: "https://cdn.hstatic.net/themes/200000289413/1001451111/14/slider_1.jpg?v=77",
+    alt: "Banner Choi Xe 1",
+  },
+  {
+    src: "https://cdn.hstatic.net/themes/200000289413/1001451111/14/slider_2.jpg?v=77",
+    alt: "Banner Choi Xe 2",
+  },
+  {
+    src: "https://cdn.hstatic.net/themes/200000289413/1001451111/14/slider_3.jpg?v=77",
+    alt: "Banner Choi Xe 3",
+  },
+  {
+    src: "https://cdn.hstatic.net/themes/200000289413/1001451111/14/slider_4.jpg?v=77",
+    alt: "Banner Choi Xe 4",
+  },
+  {
+    src: "https://cdn.hstatic.net/themes/200000289413/1001451111/14/slider_5.jpg?v=77",
+    alt: "Banner Choi Xe 5",
+  },
+] as const;
 let didEnsureDefaultCategories = false;
 
 type CategoryTreeNode = {
@@ -216,16 +238,20 @@ export async function GET(request: Request) {
     const phone = normalizeSitePhone(rawPhone ?? rawHotline);
     const hotline = normalizeSitePhone(rawHotline ?? rawPhone);
     const heroBannerRows = banners.filter((banner) => banner.kind === BannerKind.HERO);
+    const heroBanners =
+      heroBannerRows.length > 0
+        ? heroBannerRows.map((banner) => ({
+            src: banner.imageUrl,
+            alt: banner.subtitle?.trim() || banner.title,
+          }))
+        : fallbackChoixeHeroBanners;
     const popupBannerRow = banners.find((banner) => banner.kind === BannerKind.POPUP) ?? null;
 
     return NextResponse.json(
       {
         collectionLinks,
         categoryTree,
-        heroBanners: heroBannerRows.map((banner) => ({
-          src: banner.imageUrl,
-          alt: banner.subtitle?.trim() || banner.title,
-        })),
+        heroBanners,
         popupBanner: popupBannerRow
           ? {
               src: popupBannerRow.imageUrl,
