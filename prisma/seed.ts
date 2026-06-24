@@ -63,6 +63,12 @@ const categories: SeedCategory[] = [
     description: "Đèn, gương, tranh và phụ kiện trang trí nội thất.",
     sortOrder: 5,
   },
+  {
+    name: "Plywood / Ván ép",
+    slug: "plywood-van-ep",
+    description: "Ván ép plywood và vật liệu gỗ công nghiệp.",
+    sortOrder: 6,
+  },
 ];
 
 const products: SeedProduct[] = [

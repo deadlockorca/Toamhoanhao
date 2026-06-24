@@ -21,7 +21,8 @@ VALUES
   ('cat_do_trang_tri', 'Đồ trang trí', 'do-trang-tri', NULL, 7, 1, NULL, NOW()),
   ('cat_do_gia_dung', 'Đồ gia dụng', 'do-gia-dung', NULL, 8, 1, NULL, NOW()),
   ('cat_khong_gian_ngoai_troi', 'Không gian ngoài trời', 'khong-gian-ngoai-troi', NULL, 9, 1, NULL, NOW()),
-  ('cat_do_cho_be', 'Đồ cho bé', 'do-cho-be', NULL, 10, 1, NULL, NOW())
+  ('cat_do_cho_be', 'Đồ cho bé', 'do-cho-be', NULL, 10, 1, NULL, NOW()),
+  ('cat_plywood_van_ep', 'Plywood / Ván ép', 'plywood-van-ep', NULL, 11, 1, NULL, NOW())
 ON DUPLICATE KEY UPDATE
   `name` = VALUES(`name`),
   `description` = VALUES(`description`),
