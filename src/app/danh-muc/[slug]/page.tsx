@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
+import PlywoodIntroPage from "@/components/PlywoodIntroPage";
 import PublicProductGridPage from "@/components/PublicProductGridPage";
 import { getActiveCategoryBanner, getProductsByCategorySlug } from "@/lib/public-catalog";
 
@@ -16,6 +17,10 @@ export default async function CategoryDetailPage({ params }: PageProps) {
 
   if (slug === "ghe-ghe") {
     redirect("/danh-muc/ghe");
+  }
+
+  if (slug === "plywood-van-ep") {
+    return <PlywoodIntroPage />;
   }
 
   const [data, categoryBanner] = await Promise.all([
